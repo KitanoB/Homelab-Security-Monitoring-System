@@ -1,6 +1,9 @@
 package ktx.kitano.audit.service.domain;
 
-public class SecurityEventException extends RuntimeException {
+/**
+ * Exception thrown when a security event cannot be processed.
+ */
+public class SecurityEventException extends Exception {
 
     public SecurityEventException(String message) {
         super(message);

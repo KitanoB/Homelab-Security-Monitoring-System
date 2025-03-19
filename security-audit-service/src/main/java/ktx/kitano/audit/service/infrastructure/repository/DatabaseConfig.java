@@ -1,4 +1,4 @@
-package ktx.kitano.audit.service.infrastructure;
+package ktx.kitano.audit.service.infrastructure.repository;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.persistence.EntityManagerFactory;
@@ -14,6 +14,11 @@ import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Configuration class for the database
+ * Get the database credentials from the .env file
+ * Manage the connection to the database
+ */
 @Configuration
 public class DatabaseConfig {
 
@@ -25,7 +30,7 @@ public class DatabaseConfig {
     @Bean
     public DataSource dataSource() {
         return DataSourceBuilder.create()
-                .url("jdbc:mysql://localhost:3306/audit_db")
+                .url("jdbc:mysql://localhost:3306/homelab_db")
                 .username(username)
                 .password(password)
                 .driverClassName("com.mysql.cj.jdbc.Driver")

@@ -25,6 +25,7 @@
         <module>security-audit-service</module>
         <module>security-notification-service</module>
         <module>security-dashboard</module>
+        <module>core</module>
     </modules>
     <scm>
         <connection/>

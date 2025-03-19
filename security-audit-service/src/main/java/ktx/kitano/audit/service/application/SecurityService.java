@@ -1,53 +1,53 @@
 package ktx.kitano.audit.service.application;
 
+import com.kitano.iface.KtxEvent;
+import com.kitano.iface.KtxEventService;
 import ktx.kitano.audit.service.domain.SecurityEvent;
-import ktx.kitano.audit.service.iface.SecurityEventJpaRepository;
-import ktx.kitano.audit.service.infrastructure.ISecurityEventProducer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import ktx.kitano.audit.service.domain.SecurityEventException;
+import ktx.kitano.audit.service.infrastructure.repository.SecurityEventRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
+
+/**
+ * Service class for managing Security Events.
+ */
 @Service
-public class SecurityService {
+public class SecurityService implements KtxEventService<SecurityEvent> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityService.class);
+    private final SecurityEventRepository<SecurityEvent> repository;
 
-    private final SecurityEventJpaRepository service;
-    private final ISecurityEventProducer producer;
-
-    public SecurityService(SecurityEventJpaRepository service, ISecurityEventProducer producer) {
-        this.service = service;
-        this.producer = producer;
+    public SecurityService(SecurityEventRepository<SecurityEvent> repository) {
+        this.repository = repository;
     }
 
-    public SecurityEvent logEvent(SecurityEvent event) {
-        LOGGER.debug("Logging event: {}", event);
+    @Override
+    public SecurityEvent save(SecurityEvent event) throws Exception {
         if (event == null) {
-            LOGGER.error("Event cannot be null");
-            return null;
+            throw new SecurityEventException("Event cannot be null");
         }
-        SecurityEvent savedEvent = save(event);
-        sendEvent(savedEvent);
-        return savedEvent;
+        return repository.save(event);
     }
 
-    @Transactional
-    private SecurityEvent save(SecurityEvent event) {
-        LOGGER.debug("Saving event: {}", event);
-        return service.save(event);
+    @Override
+    public List<SecurityEvent> findByType(KtxEvent.EventType eventType) {
+        return Collections.unmodifiableList(repository.findByType(eventType));
     }
 
-    @Transactional(readOnly = true)
-    private void sendEvent(SecurityEvent event) {
-        LOGGER.debug("Sending event: {}", event);
-        producer.send("security-events", event);
+    @Override
+    public List<SecurityEvent> findAll() {
+        return Collections.unmodifiableList(repository.findAll());
     }
 
-    public List<SecurityEvent> getAllEvents() {
-        LOGGER.debug("Retrieving all events");
-        return service.findAll();
+    @Override
+    public SecurityEvent findById(String id) {
+        return repository.findById(id);
+    }
+
+    @Override
+    public List<SecurityEvent> findByUserId(String id) {
+        return Collections.unmodifiableList(repository.findByUserId(id));
     }
 }

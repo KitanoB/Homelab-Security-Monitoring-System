@@ -1,4 +1,4 @@
-package ktx.kitano.audit.service.infrastructure;
+package ktx.kitano.audit.service.infrastructure.messaging;
 
 import ktx.kitano.audit.service.domain.SecurityEvent;
 import org.apache.kafka.clients.producer.ProducerConfig;
