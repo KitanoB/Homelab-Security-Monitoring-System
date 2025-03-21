@@ -1,6 +1,6 @@
 package ktx.kitano.audit.service.domain;
 
-import com.kitano.iface.KtxEvent;
+import com.kitano.iface.model.KtxEvent;
 import jakarta.persistence.*;
 import lombok.Data;
 

@@ -35,7 +35,7 @@ public class SecurityEventController {
         LOGGER.info("Received request to log event: {}", event);
 
         try {
-            SecurityEvent savedEvent = eventService.save(event);
+            SecurityEvent savedEvent = eventService.logEvent(event);
             return ResponseEntity.status(201).body(savedEvent);
         } catch (SecurityEventException e) {
             LOGGER.error("Error logging event: {}", e.getMessage(), e);

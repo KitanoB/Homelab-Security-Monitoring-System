@@ -10,12 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Kafka producer implementation for SecurityEvent.
- */
 @Service
-public class SecurityEventProducer implements KtxEventProducer<SecurityEvent> {
-
+public class SecurityEventProducer {
     private static final Logger LOGGER = LoggerFactory.getLogger(SecurityEventProducer.class);
     private static final String TOPIC = "security-events";
 
@@ -25,17 +21,16 @@ public class SecurityEventProducer implements KtxEventProducer<SecurityEvent> {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    @Override
-    public void send(String topicName, SecurityEvent event) {
-        LOGGER.debug("Sending event to topic '{}': {}", topicName, event);
+    public void sendEvent(SecurityEvent event) {
+        LOGGER.debug("Sending event to topic '{}': {}", TOPIC, event);
 
-        CompletableFuture<SendResult<String, SecurityEvent>> future = kafkaTemplate.send(topicName, event);
+        CompletableFuture<SendResult<String, SecurityEvent>> future = kafkaTemplate.send(TOPIC, event);
 
         future.whenComplete((result, exception) -> {
             if (exception != null) {
-                LOGGER.error("Kafka Error while sending event to topic '{}': {}", topicName, exception.getMessage(), exception);
+                LOGGER.error("Kafka Error while sending event to topic '{}': {}", TOPIC, exception.getMessage(), exception);
             } else {
-                LOGGER.info("Event successfully sent to topic '{}'", topicName);
+                LOGGER.info("Event successfully sent to topic '{}'", TOPIC);
             }
         });
     }

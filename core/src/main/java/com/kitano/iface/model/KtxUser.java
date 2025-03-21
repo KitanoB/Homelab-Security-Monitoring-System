@@ -1,4 +1,4 @@
-package com.kitano.iface;
+package com.kitano.iface.model;
 
 import java.time.LocalDateTime;
 
