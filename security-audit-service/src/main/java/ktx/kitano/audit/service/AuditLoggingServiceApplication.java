@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class AuditLoggingServiceApplication {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AuditLoggingServiceApplication.class);
+
     public static void main(String[] args) {
         LOGGER.info("Starting Audit Logging Service");
         SpringApplication.run(AuditLoggingServiceApplication.class, args);

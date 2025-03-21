@@ -1,7 +1,10 @@
 # **Hexagonal Architecture for **
 
 ## **Overview**
-This module implements **Hexagonal Architecture (Ports and Adapters Pattern)** to ensure **modularity, reusability, and scalability** in event logging and processing. It separates **business logic** from **infrastructure** so that external dependencies (MySQL, Kafka, REST API) can be easily replaced or extended.
+
+This module implements **Hexagonal Architecture (Ports and Adapters Pattern)** to ensure **modularity, reusability, and
+scalability** in event logging and processing. It separates **business logic** from **infrastructure** so that external
+dependencies (MySQL, Kafka, REST API) can be easily replaced or extended.
 
 ---
 
@@ -45,6 +48,7 @@ This module implements **Hexagonal Architecture (Ports and Adapters Pattern)** t
 ```
 
 ### **Benefits of This Architecture**
+
 - **Reusability**: The domain logic is independent of external dependencies.
 - **Scalability**: Easily add new services, databases, or messaging systems.
 - **Testability**: Mock adapters for unit testing without external systems.
@@ -55,20 +59,24 @@ This module implements **Hexagonal Architecture (Ports and Adapters Pattern)** t
 ## **Components**
 
 ### **1️⃣ Core Domain Layer**
+
 - **`KtxEvent<T>`** → Defines a generic event structure.
 - **`KtxUser`** → Represents a user interface.
 - **`KtxEventService<T>`** → Interface for event operations.
 - **`KtxEventProducer<T>`** → Defines event publishing contract.
 
 ### **2️⃣ Application Layer**
+
 - **`SecurityService`** → Implements event processing and interacts with repositories and Kafka producers.
 
 ### **3️⃣ Infrastructure Layer**
+
 - **`SecurityEventRepository`** → Handles MySQL persistence.
 - **`SecurityEventProducer`** → Publishes events to Kafka.
 - **`SecurityEventController`** → Exposes REST API endpoints.
 
 ### **4️⃣ External Systems**
+
 - **MySQL** → Stores security events.
 - **Kafka** → Publishes security event messages.
 - **REST API** → Exposes endpoints for event logging and retrieval.
@@ -76,8 +84,11 @@ This module implements **Hexagonal Architecture (Ports and Adapters Pattern)** t
 ---
 
 ## **Setup & Installation**
+
 ### **1️⃣ Configure Database (MySQL)**
+
 Ensure you have a running MySQL instance and update **`application.properties`**:
+
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/ktx_audit
 spring.datasource.username=root
@@ -87,22 +98,29 @@ spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
 ```
 
 ### **2️⃣ Run Docker for Kafka**
+
 Use `docker-compose.yml` to spin up Kafka and Zookeeper:
+
 ```sh
 docker-compose up -d
 ```
 
 ### **3️⃣ Start the Application**
+
 ```sh
 mvn clean spring-boot:run
 ```
 
 ### **4️⃣ Test API with Postman**
+
 #### **Log a Security Event**
+
 ```http
 POST /api/events/log
 ```
+
 ##### **JSON Payload**:
+
 ```json
 {
     "eventType": "AUTH",
@@ -115,6 +133,7 @@ POST /api/events/log
 ```
 
 #### **Retrieve All Events**
+
 ```http
 GET /api/events/all
 ```
@@ -122,6 +141,7 @@ GET /api/events/all
 ---
 
 ## **Built With**
+
 - **Spring Boot** (REST API & Service Layer)
 - **Spring Data JPA** (Persistence Layer)
 - **MySQL** (Database)
@@ -132,6 +152,7 @@ GET /api/events/all
 ---
 
 ## **Future Improvements**
+
 - **Add support for MongoDB as an alternative storage option**.
 - **Enhance logging with distributed tracing (Zipkin, OpenTelemetry)**.
 - **Implement event replay for Kafka to handle failure recovery**.
@@ -139,5 +160,6 @@ GET /api/events/all
 ---
 
 ## **Contributing**
+
 Feel free to contribute by submitting **pull requests** or opening **issues**.
 

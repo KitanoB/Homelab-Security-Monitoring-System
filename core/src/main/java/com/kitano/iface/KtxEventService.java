@@ -11,8 +11,12 @@ import java.util.List;
  */
 public interface KtxEventService<T extends KtxEvent<?>> {
     T save(T event) throws Exception;
+
     List<T> findByType(KtxEvent.EventType eventType);
+
     List<T> findAll();
+
     T findById(String id);
+
     List<T> findByUserId(String userId);
 }

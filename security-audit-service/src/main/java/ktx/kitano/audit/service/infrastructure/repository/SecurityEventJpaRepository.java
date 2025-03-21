@@ -10,5 +10,6 @@ import java.util.List;
 @Repository
 public interface SecurityEventJpaRepository extends JpaRepository<SecurityEvent, String> {
     List<SecurityEvent> findByEventType(KtxEvent.EventType eventType);
+
     List<SecurityEvent> findByUserId(String userId);
 }

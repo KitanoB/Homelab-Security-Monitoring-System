@@ -1,6 +1,5 @@
 package ktx.kitano.audit.service.infrastructure.messaging;
 
-import com.kitano.iface.KtxEventProducer;
 import ktx.kitano.audit.service.domain.SecurityEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
