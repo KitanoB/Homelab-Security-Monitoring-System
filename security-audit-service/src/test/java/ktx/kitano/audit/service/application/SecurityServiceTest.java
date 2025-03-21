@@ -1,131 +1,120 @@
 package ktx.kitano.audit.service.application;
 
-import com.kitano.iface.KtxEvent;
-import ktx.kitano.audit.service.domain.HomeLabUser;
+import com.kitano.iface.model.KtxEvent;
 import ktx.kitano.audit.service.domain.SecurityEvent;
 import ktx.kitano.audit.service.domain.SecurityEventException;
-import ktx.kitano.audit.service.infrastructure.repository.SecurityEventRepository;
+import ktx.kitano.audit.service.infrastructure.messaging.SecurityEventProducer;
+import ktx.kitano.audit.service.infrastructure.repository.SecurityEventStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class SecurityServiceTest {
 
-    private SecurityEvent event;
+    @Mock
+    private SecurityEventStore<SecurityEvent> repository;
+
+    @Mock
+    private SecurityEventProducer producer;
+
+    @InjectMocks
     private SecurityService service;
-    private SecurityEventRepository<SecurityEvent> repository;
-    private HomeLabUser user;
+
+    private SecurityEvent event;
 
     @BeforeEach
     void setUp() {
-        repository = Mockito.mock(SecurityEventRepository.class);
-        user = Mockito.mock(HomeLabUser.class);
-
         event = new SecurityEvent(
                 KtxEvent.EventType.AUTH,
                 KtxEvent.Level.WARNING,
                 KtxEvent.Criticality.REGULAR,
-                UUID.randomUUID().toString(),
+                "550e8400-e29b-41d4-a716-446655440000",
                 "127.0.0.1",
                 "Failed login attempt"
         );
-
-        service = new SecurityService(repository);
     }
 
     @Test
-    void save_shouldSaveEventSuccessfully() throws Exception {
+    void logEvent_shouldSaveEventAndTriggerKafka() throws Exception {
         when(repository.save(event)).thenReturn(event);
 
-        SecurityEvent result = service.save(event);
+        SecurityEvent result = service.logEvent(event);
 
-        verify(repository, times(1)).save(event);
+        assertNotNull(result);
         assertEquals(event, result);
-    }
-
-    @Test
-    void save_shouldThrowExceptionWhenEventIsNull() {
-        assertThrows(SecurityEventException.class, () -> service.save(null));
-        verifyNoInteractions(repository);
-    }
-
-    @Test
-    void save_shouldHandleRepositoryException() throws SecurityEventException {
-        when(repository.save(event)).thenThrow(new RuntimeException("Database error"));
-
-        assertThrows(RuntimeException.class, () -> service.save(event));
 
         verify(repository, times(1)).save(event);
+        verify(producer, times(1)).sendEvent(event);
     }
 
     @Test
-    void findAll_shouldReturnListOfEvents() {
+    void logEvent_shouldThrowExceptionWhenEventIsNull() {
+        Exception exception = assertThrows(Exception.class, () -> service.logEvent(null));
+        assertInstanceOf(SecurityEventException.class, exception);
+        assertEquals("Event cannot be null", exception.getMessage());
+        verifyNoInteractions(repository, producer);
+    }
+
+    @Test
+    void logEvent_shouldHandleRepositoryException() throws Exception {
+        when(repository.save(event)).thenThrow(new RuntimeException("Database error"));
+        assertThrows(RuntimeException.class, () -> service.logEvent(event));
+        verify(producer, never()).sendEvent(event);
+    }
+
+    @Test
+    void getAllEvents_shouldReturnAllEvents() {
         when(repository.findAll()).thenReturn(List.of(event));
 
         List<SecurityEvent> result = service.findAll();
 
         assertEquals(1, result.size());
         assertEquals(event, result.get(0));
+
         verify(repository, times(1)).findAll();
     }
 
     @Test
-    void findAll_shouldReturnEmptyListWhenNoEvents() {
-        when(repository.findAll()).thenReturn(List.of());
+    void getEventsByUser_shouldReturnUserSpecificEvents() {
+        when(repository.findByUserId("550e8400-e29b-41d4-a716-446655440000")).thenReturn(List.of(event));
 
-        List<SecurityEvent> result = service.findAll();
-
-        assertTrue(result.isEmpty());
-        verify(repository, times(1)).findAll();
-    }
-
-    @Test
-    void findByType_shouldReturnMatchingEvents() {
-        when(repository.findByType(KtxEvent.EventType.AUTH)).thenReturn(List.of(event));
-
-        List<SecurityEvent> result = service.findByType(KtxEvent.EventType.AUTH);
+        List<SecurityEvent> result = service.findByUserId("550e8400-e29b-41d4-a716-446655440000");
 
         assertEquals(1, result.size());
         assertEquals(event, result.get(0));
-        verify(repository, times(1)).findByType(KtxEvent.EventType.AUTH);
+
+        verify(repository, times(1)).findByUserId("550e8400-e29b-41d4-a716-446655440000");
     }
 
     @Test
-    void findByType_shouldReturnEmptyListWhenNoMatchingEvents() {
-        when(repository.findByType(KtxEvent.EventType.AUTH)).thenReturn(List.of());
+    void getEventById_shouldReturnEventIfExists() {
+        when(repository.findById("1234")).thenReturn(event);
 
-        List<SecurityEvent> result = service.findByType(KtxEvent.EventType.AUTH);
-
-        assertTrue(result.isEmpty());
-        verify(repository, times(1)).findByType(KtxEvent.EventType.AUTH);
-    }
-
-    @Test
-    void findById_shouldReturnEventIfExists() {
-        UUID eventId = UUID.randomUUID();
-        when(repository.findById(eventId.toString())).thenReturn(event);
-
-        SecurityEvent result = service.findById(eventId.toString());
+        SecurityEvent result = service.findById("1234");
 
         assertNotNull(result);
         assertEquals(event, result);
-        verify(repository, times(1)).findById(eventId);
+
+        verify(repository, times(1)).findById("1234");
     }
 
     @Test
-    void findById_shouldReturnNullIfNotFound() {
-        UUID eventId = UUID.randomUUID();
-        when(repository.findById(eventId.toString())).thenReturn(null);
+    void getEventById_shouldReturnNullIfNotFound() {
+        when(repository.findById("9999")).thenReturn(null);
 
-        SecurityEvent result = service.findById(eventId.toString());
+        SecurityEvent result = service.findById("9999");
 
         assertNull(result);
-        verify(repository, times(1)).findById(eventId.toString());
+
+        verify(repository, times(1)).findById("9999");
     }
 }

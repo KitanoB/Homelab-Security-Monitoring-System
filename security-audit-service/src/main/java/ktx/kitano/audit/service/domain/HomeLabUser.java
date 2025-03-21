@@ -1,6 +1,6 @@
 package ktx.kitano.audit.service.domain;
 
-import com.kitano.iface.KtxUser;
+import com.kitano.iface.model.KtxUser;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;

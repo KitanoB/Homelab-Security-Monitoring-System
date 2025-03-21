@@ -1,13 +1,15 @@
 package ktx.kitano.audit.service.application;
 
-import com.kitano.iface.KtxEvent;
-import com.kitano.iface.KtxEventService;
+import com.kitano.iface.model.KtxEvent;
 import ktx.kitano.audit.service.domain.SecurityEvent;
 import ktx.kitano.audit.service.domain.SecurityEventException;
-import ktx.kitano.audit.service.infrastructure.repository.SecurityEventRepository;
+import ktx.kitano.audit.service.infrastructure.messaging.SecurityEventProducer;
+import ktx.kitano.audit.service.infrastructure.repository.SecurityEventStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 
 
@@ -15,39 +17,41 @@ import java.util.List;
  * Service class for managing Security Events.
  */
 @Service
-public class SecurityService implements KtxEventService<SecurityEvent> {
+public class SecurityService {
 
-    private final SecurityEventRepository<SecurityEvent> repository;
+    private final static Logger LOGGER = LoggerFactory.getLogger(SecurityService.class);
 
-    public SecurityService(SecurityEventRepository<SecurityEvent> repository) {
-        this.repository = repository;
+    private final SecurityEventStore<SecurityEvent> eventStore;
+    private final SecurityEventProducer producer;
+
+    @Autowired
+    public SecurityService(SecurityEventStore<SecurityEvent> eventStore, SecurityEventProducer producer) {
+        this.eventStore = eventStore;
+        this.producer = producer;
     }
 
-    @Override
-    public SecurityEvent save(SecurityEvent event) throws Exception {
+    public SecurityEvent logEvent(SecurityEvent event) throws Exception {
         if (event == null) {
             throw new SecurityEventException("Event cannot be null");
         }
-        return repository.save(event);
+        SecurityEvent savedEvent = eventStore.save(event);
+        producer.sendEvent(savedEvent);
+        return savedEvent;
     }
 
-    @Override
     public List<SecurityEvent> findByType(KtxEvent.EventType eventType) {
-        return Collections.unmodifiableList(repository.findByType(eventType));
+        return eventStore.findByType(eventType);
     }
 
-    @Override
     public List<SecurityEvent> findAll() {
-        return Collections.unmodifiableList(repository.findAll());
+        return eventStore.findAll();
     }
 
-    @Override
     public SecurityEvent findById(String id) {
-        return repository.findById(id);
+        return eventStore.findById(id);
     }
 
-    @Override
     public List<SecurityEvent> findByUserId(String id) {
-        return Collections.unmodifiableList(repository.findByUserId(id));
+        return eventStore.findByUserId(id);
     }
 }

@@ -1,4 +1,4 @@
-package com.kitano.iface;
+package com.kitano.iface.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
