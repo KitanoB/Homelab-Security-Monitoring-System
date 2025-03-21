@@ -5,6 +5,8 @@ import ktx.kitano.audit.service.domain.SecurityEvent;
 import ktx.kitano.audit.service.domain.SecurityEventException;
 import ktx.kitano.audit.service.infrastructure.messaging.SecurityEventProducer;
 import ktx.kitano.audit.service.infrastructure.repository.SecurityEventStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,8 @@ import java.util.List;
  */
 @Service
 public class SecurityService {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(SecurityService.class);
 
     private final SecurityEventStore<SecurityEvent> eventStore;
     private final SecurityEventProducer producer;
