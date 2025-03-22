@@ -7,7 +7,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
@@ -16,9 +15,10 @@ import java.util.List;
 @Repository
 public class SecurityEventJpaStore implements SecurityEventStore<SystemEvent> {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(SecurityEventJpaStore.class);
-    @Autowired
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityEventJpaStore.class);
+
     private final SecurityEventJpaRepository jpaRepository;
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -45,8 +45,8 @@ public class SecurityEventJpaStore implements SecurityEventStore<SystemEvent> {
     }
 
     @Override
-    public List<SystemEvent> findAll() {
-        List<SystemEvent> events = jpaRepository.findAll(Sort.by(Sort.Direction.DESC, "timestamp"));
+    public List<SystemEvent> findAllByOrder(Sort.Direction direction) {
+        List<SystemEvent> events = jpaRepository.findAll(Sort.by(direction, "timestamp"));
         LOGGER.trace("Found {} events", events.size());
         return events;
     }

@@ -20,13 +20,13 @@ import javax.sql.DataSource;
 @EntityScan(basePackages = "com.kitano.core.model")
 @EnableJpaRepositories(basePackages = "ktx.kitano.security.service.infrastructure.repository")
 @EnableConfigurationProperties(SecurityProperties.class)
-public class AuditLoggingServiceApplication {
+public class SecurityServiceApplication {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(AuditLoggingServiceApplication.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityServiceApplication.class);
 
     public static void main(String[] args) {
-        LOGGER.info("Starting Audit Logging Service");
-        SpringApplication.run(AuditLoggingServiceApplication.class, args);
+        LOGGER.info("Starting Security Service");
+        SpringApplication.run(SecurityServiceApplication.class, args);
     }
 
     @Bean

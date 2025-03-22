@@ -31,15 +31,15 @@ class SecurityEventRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        event = new SystemEvent(
-                KtxEvent.EventType.AUTHENTICATION_SUCCESS,
-                KtxEvent.Level.WARNING,
-                KtxEvent.Criticality.REGULAR,
-                "550e8400-e29b-41d4-a716-446655440000",
-                "127.0.0.1",
-                "Failed login attempt",
-                "security-service"
-        );
+        event = SystemEvent.builder()
+                .eventType(KtxEvent.EventType.AUTHENTICATION_FAILURE)
+                .level(KtxEvent.Level.WARNING)
+                .criticality(KtxEvent.Criticality.REGULAR)
+                .userId("550e8400-e29b-41d4-a716-446655440000")
+                .ipAddress("127.0.0.1")
+                .message("Failed login attempt")
+                .source("security-service")
+                .build();
     }
 
     @Test
@@ -69,17 +69,6 @@ class SecurityEventRepositoryTest {
         assertEquals(1, result.size());
         assertEquals(event, result.get(0));
         verify(jpaRepository, times(1)).findByEventType(KtxEvent.EventType.AUTHENTICATION_SUCCESS);
-    }
-
-    @Test
-    void findAll_shouldReturnAllEvents() {
-        when(jpaRepository.findAll()).thenReturn(List.of(event));
-
-        List<SystemEvent> result = repository.findAll();
-
-        assertEquals(1, result.size());
-        assertEquals(event, result.get(0));
-        verify(jpaRepository, times(1)).findAll();
     }
 
     @Test

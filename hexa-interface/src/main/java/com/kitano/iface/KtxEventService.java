@@ -1,6 +1,7 @@
 package com.kitano.iface;
 
 import com.kitano.iface.model.KtxEvent;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface KtxEventService<T extends KtxEvent<?>> {
 
     List<T> findByType(KtxEvent.EventType eventType);
 
-    List<T> findAll();
+    List<T> findAllByOrder(Sort.Direction direction);
 
     T findById(String id);
 

@@ -5,6 +5,7 @@ import com.kitano.core.model.SystemException;
 import ktx.kitano.security.service.application.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,7 +56,7 @@ public class SecurityEventController {
     public ResponseEntity<List<SystemEvent>> getAllEvents() {
         LOGGER.info("Received request to get all events");
 
-        List<SystemEvent> events = eventService.findAll();
+        List<SystemEvent> events = eventService.findAllByOrder(Sort.Direction.DESC);
 
         if (events.isEmpty()) {
             return ResponseEntity.noContent().build();

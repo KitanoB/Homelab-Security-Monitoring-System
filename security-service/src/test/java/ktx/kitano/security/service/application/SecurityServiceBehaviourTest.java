@@ -4,7 +4,7 @@ import com.kitano.core.model.SystemEvent;
 import com.kitano.core.model.SystemException;
 import com.kitano.iface.model.KtxEvent;
 import ktx.kitano.security.service.config.SecurityProperties;
-import ktx.kitano.security.service.config.UsualBehaviourProperties;
+import ktx.kitano.security.service.config.UnusualBehaviourProperties;
 import ktx.kitano.security.service.infrastructure.messaging.SecurityEventProducer;
 import ktx.kitano.security.service.infrastructure.repository.SecurityEventStore;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 import static com.kitano.iface.model.KtxEvent.EventType.AUTHENTICATION_FAILURE;
 import static com.kitano.iface.model.KtxEvent.EventType.AUTHENTICATION_SUCCESS;
@@ -26,7 +25,7 @@ class SecurityServiceBehaviourTest {
     private SecurityEventProducer producer;
     private SecurityService service;
     private SecurityProperties securityProperties;
-    private UsualBehaviourProperties usualBehaviourProperties;
+    private UnusualBehaviourProperties usualBehaviourProperties;
     private long timeDifference = 1;
 
     @BeforeEach
@@ -34,7 +33,7 @@ class SecurityServiceBehaviourTest {
         store = mock(SecurityEventStore.class);
         producer = mock(SecurityEventProducer.class);
         securityProperties = new SecurityProperties();
-        usualBehaviourProperties = new UsualBehaviourProperties();
+        usualBehaviourProperties = new UnusualBehaviourProperties();
         service = new SecurityService(store, producer, securityProperties, usualBehaviourProperties);
     }
 
@@ -141,16 +140,15 @@ class SecurityServiceBehaviourTest {
     }
 
     private SystemEvent event(KtxEvent.EventType type) {
-        return new SystemEvent(
-                UUID.randomUUID().toString(),
-                LocalDateTime.now().plusMinutes(++timeDifference),
-                type,
-                KtxEvent.Level.INFO,
-                KtxEvent.Criticality.REGULAR,
-                userId,
-                "localhost",
-                "Test event",
-                "auth-service"
-        );
+        return SystemEvent.builder()
+                .eventType(type)
+                .level(KtxEvent.Level.INFO)
+                .criticality(KtxEvent.Criticality.REGULAR)
+                .userId(userId)
+                .ipAddress("localhost")
+                .message("Test event")
+                .source("auth-service")
+                .timestamp(LocalDateTime.now().plusMinutes(++timeDifference))
+                .build();
     }
 }

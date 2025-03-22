@@ -20,8 +20,8 @@ public class SecurityEventConsumer {
     }
 
     @KafkaListener(topics = "auth-events", groupId = "security-service")
-    public void consume(ConsumerRecord<String, SystemEvent> record) {
-        SystemEvent event = record.value();
+    public void consume(ConsumerRecord<String, SystemEvent> systemEventConsumerRecord) {
+        SystemEvent event = systemEventConsumerRecord.value();
         LOGGER.info("Consumed SystemEvent from topic auth-events: {}", event);
         try {
             service.secure(event);
