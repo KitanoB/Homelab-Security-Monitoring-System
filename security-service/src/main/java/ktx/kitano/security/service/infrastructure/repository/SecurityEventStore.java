@@ -9,4 +9,6 @@ public interface SecurityEventStore<T extends KtxEvent<?>> extends KtxEventServi
     List<T> findByType(KtxEvent.EventType eventType);
 
     List<T> findByUserId(String userId);
+
+    List<T> findByUserId(String userId, int limit);
 }

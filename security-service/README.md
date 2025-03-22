@@ -123,12 +123,12 @@ POST /api/events/log
 
 ```json
 {
-    "eventType": "AUTH",
-    "level": "WARNING",
-    "criticality": "REGULAR",
-    "userId": "550e8400-e29b-41d4-a716-446655440000",
-    "ipAddress": "127.0.0.1",
-    "message": "Failed login attempt"
+  "eventType": "AUTH",
+  "level": "WARNING",
+  "criticality": "REGULAR",
+  "userId": "550e8400-e29b-41d4-a716-446655440000",
+  "ipAddress": "127.0.0.1",
+  "message": "Failed login attempt"
 }
 ```
 

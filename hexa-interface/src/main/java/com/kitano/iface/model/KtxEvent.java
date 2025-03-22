@@ -37,11 +37,11 @@ public interface KtxEvent<T> {
     }
 
     public enum EventType {
-        AUTH,
+        AUTHENTICATION_SUCCESS,
+        AUTHENTICATION_FAILURE,
         USER_ACTION,
+        UNUSUAL_BEHAVIOR,
         SYSTEM,
-        APPLICATION,
-        SECURITY,
-        LOGIN_ATTEMPT
+        SECURITY
     }
 }

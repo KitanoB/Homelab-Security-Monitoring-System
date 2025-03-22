@@ -1,8 +1,8 @@
 package ktx.kitano.security.service.application;
 
 import com.kitano.core.model.SystemEvent;
-import com.kitano.iface.model.KtxEvent;
 import com.kitano.core.model.SystemException;
+import com.kitano.iface.model.KtxEvent;
 import ktx.kitano.security.service.infrastructure.messaging.SecurityEventProducer;
 import ktx.kitano.security.service.infrastructure.repository.SecurityEventStore;
 import org.junit.jupiter.api.BeforeEach;

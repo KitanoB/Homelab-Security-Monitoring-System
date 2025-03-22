@@ -1,13 +1,12 @@
 package ktx.kitano.security.service;
 
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.metamodel.Metamodel;
+import ktx.kitano.security.service.config.SecurityProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -17,12 +16,10 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import javax.sql.DataSource;
 
 @EnableKafka
-@SpringBootApplication(scanBasePackages = {
-        "ktx.kitano.security.service",
-        "com.kitano.core"
-})
+@SpringBootApplication(scanBasePackages = {"ktx.kitano.security.service", "com.kitano.core"})
 @EntityScan(basePackages = "com.kitano.core.model")
 @EnableJpaRepositories(basePackages = "ktx.kitano.security.service.infrastructure.repository")
+@EnableConfigurationProperties(SecurityProperties.class)
 public class AuditLoggingServiceApplication {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AuditLoggingServiceApplication.class);
