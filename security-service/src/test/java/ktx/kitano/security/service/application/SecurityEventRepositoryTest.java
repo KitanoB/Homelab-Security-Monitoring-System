@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class SecurityEventJpaStoreTest {
+class SecurityEventRepositoryTest {
 
     @Mock
     private SecurityEventJpaRepository jpaRepository;
@@ -32,7 +32,7 @@ class SecurityEventJpaStoreTest {
     @BeforeEach
     void setUp() {
         event = new SystemEvent(
-                KtxEvent.EventType.AUTH,
+                KtxEvent.EventType.AUTHENTICATION_SUCCESS,
                 KtxEvent.Level.WARNING,
                 KtxEvent.Criticality.REGULAR,
                 "550e8400-e29b-41d4-a716-446655440000",
@@ -62,13 +62,13 @@ class SecurityEventJpaStoreTest {
 
     @Test
     void findByType_shouldReturnMatchingEvents() {
-        when(jpaRepository.findByEventType(KtxEvent.EventType.AUTH)).thenReturn(List.of(event));
+        when(jpaRepository.findByEventType(KtxEvent.EventType.AUTHENTICATION_SUCCESS)).thenReturn(List.of(event));
 
-        List<SystemEvent> result = repository.findByType(KtxEvent.EventType.AUTH);
+        List<SystemEvent> result = repository.findByType(KtxEvent.EventType.AUTHENTICATION_SUCCESS);
 
         assertEquals(1, result.size());
         assertEquals(event, result.get(0));
-        verify(jpaRepository, times(1)).findByEventType(KtxEvent.EventType.AUTH);
+        verify(jpaRepository, times(1)).findByEventType(KtxEvent.EventType.AUTHENTICATION_SUCCESS);
     }
 
     @Test

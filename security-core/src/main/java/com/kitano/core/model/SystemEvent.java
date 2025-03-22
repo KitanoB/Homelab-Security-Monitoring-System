@@ -24,7 +24,7 @@ public class SystemEvent implements KtxEvent<String> {
     private LocalDateTime timestamp;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "event_type", nullable = false)
+    @Column(name = "event_type", nullable = false, length = 50)
     private EventType eventType;
 
     @Enumerated(EnumType.STRING)
@@ -55,6 +55,19 @@ public class SystemEvent implements KtxEvent<String> {
         this.eventType = eventType;
         this.level = level;
         this.criticality = criticality;
+        this.userId = userId;
+        this.ipAddress = ipAddress;
+        this.message = message;
+        this.source = source;
+    }
+
+    public SystemEvent(String id, LocalDateTime timestamp, EventType eventType, Level level, Criticality criticality,
+                       String userId, String ipAddress, String message, String source) {
+        this.id = id;
+        this.timestamp = timestamp;
+        this.eventType = eventType;
+        this.level = Level.INFO;
+        this.criticality = Criticality.REGULAR;
         this.userId = userId;
         this.ipAddress = ipAddress;
         this.message = message;

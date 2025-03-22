@@ -8,6 +8,7 @@ import jakarta.persistence.PersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -45,7 +46,7 @@ public class SecurityEventJpaStore implements SecurityEventStore<SystemEvent> {
 
     @Override
     public List<SystemEvent> findAll() {
-        List<SystemEvent> events = jpaRepository.findAll();
+        List<SystemEvent> events = jpaRepository.findAll(Sort.by(Sort.Direction.DESC, "timestamp"));
         LOGGER.trace("Found {} events", events.size());
         return events;
     }
@@ -68,11 +69,13 @@ public class SecurityEventJpaStore implements SecurityEventStore<SystemEvent> {
     @Override
     public List<SystemEvent> findByUserId(String userId, int limit) {
         LOGGER.trace("Finding {} events for user: {}", limit, userId);
-        List<SystemEvent> events = entityManager.createQuery("SELECT e FROM SystemEvent e WHERE e.userId = :userId", SystemEvent.class)
+        List<SystemEvent> events = entityManager.createQuery("SELECT e FROM SystemEvent e WHERE e.userId = :userId ORDER BY timestamp DESC", SystemEvent.class)
                 .setParameter("userId", userId)
                 .setMaxResults(limit)
                 .getResultList();
         LOGGER.trace("Found {} events for user: {}", events.size(), userId);
         return events;
     }
+
+
 }

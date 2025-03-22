@@ -34,7 +34,7 @@ class SecurityServiceTest {
     @BeforeEach
     void setUp() {
         event = new SystemEvent(
-                KtxEvent.EventType.AUTH,
+                KtxEvent.EventType.AUTHENTICATION_FAILURE,
                 KtxEvent.Level.WARNING,
                 KtxEvent.Criticality.REGULAR,
                 "550e8400-e29b-41d4-a716-446655440000",
