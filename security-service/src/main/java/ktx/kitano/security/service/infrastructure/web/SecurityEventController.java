@@ -40,7 +40,7 @@ public class SecurityEventController {
             return ResponseEntity.status(201).body(savedEvent);
         } catch (SystemException e) {
             LOGGER.error("Error logging event: {}", e.getMessage(), e);
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.internalServerError().build();
         } catch (Exception e) {
             LOGGER.error("Unexpected error while logging event: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().build();
@@ -102,6 +102,6 @@ public class SecurityEventController {
     @ExceptionHandler(SystemException.class)
     public ResponseEntity<String> handleSecurityEventException(SystemException e) {
         LOGGER.error("Handled SecurityEventException: {}", e.getMessage(), e);
-        return ResponseEntity.badRequest().body(e.getMessage());
+        return ResponseEntity.internalServerError().body(e.getMessage());
     }
 }

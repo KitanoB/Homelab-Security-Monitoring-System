@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- Console Appender (Logs to Console) -->
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <!-- File Appender (Logs to audit-service.log) -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/audit-service.log</file>
+        <file>logs/security-service.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/audit-service-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>logs/security-service-%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory> <!-- Keep logs for 30 days -->
         </rollingPolicy>
         <encoder>
@@ -19,7 +18,6 @@
         </encoder>
     </appender>
 
-    <!-- Root Logger (Logs everything at INFO level) -->
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>

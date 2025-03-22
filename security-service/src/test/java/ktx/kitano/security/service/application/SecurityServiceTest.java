@@ -75,14 +75,14 @@ class SecurityServiceTest {
 
     @Test
     void getAllEvents_shouldReturnAllEvents() {
-        when(repository.findAll(Sort.Direction.DESC)).thenReturn(List.of(event));
+        when(repository.findAllByOrder(Sort.Direction.DESC)).thenReturn(List.of(event));
 
-        List<SystemEvent> result = service.findAll(Sort.Direction.DESC);
+        List<SystemEvent> result = service.findAllByOrder(Sort.Direction.DESC);
 
         assertEquals(1, result.size());
         assertEquals(event, result.get(0));
 
-        verify(repository, times(1)).findAll(Sort.Direction.DESC);
+        verify(repository, times(1)).findAllByOrder(Sort.Direction.DESC);
     }
 
     @Test

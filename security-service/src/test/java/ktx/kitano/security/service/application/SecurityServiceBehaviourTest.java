@@ -8,6 +8,7 @@ import ktx.kitano.security.service.config.UnusualBehaviourProperties;
 import ktx.kitano.security.service.infrastructure.messaging.SecurityEventProducer;
 import ktx.kitano.security.service.infrastructure.repository.SecurityEventStore;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -71,7 +72,7 @@ class SecurityServiceBehaviourTest {
     }
 
     @Test
-    void secure_shouldAllowNormalBehavior() throws Exception {
+    void secure_shouldAllowNormalBehavior() {
 
         List<SystemEvent> events = List.of(
                 event(AUTHENTICATION_SUCCESS),
@@ -87,7 +88,7 @@ class SecurityServiceBehaviourTest {
     }
 
     @Test
-    void secure_shouldHandleEmptyEventList() throws Exception {
+    void secure_shouldHandleEmptyEventList() {
         when(store.findByUserId(userId)).thenReturn(List.of());
 
         SystemEvent newEvent = event(AUTHENTICATION_FAILURE);
@@ -97,7 +98,6 @@ class SecurityServiceBehaviourTest {
 
     @Test
     void secure_shouldSendSecurityEventIfTooManyUnusualBehaviorInPeriod() throws Exception {
-        // Simule un seuil dépassé
         usualBehaviourProperties.setCount(3);
         usualBehaviourProperties.setDays(7);
 
@@ -139,6 +139,71 @@ class SecurityServiceBehaviourTest {
         verify(producer, never()).sendEvent(argThat(e -> e.eventType() == KtxEvent.EventType.SECURITY));
     }
 
+    @Test
+    @DisplayName("Should throw when user has too many distinct IP addresses")
+    void secure_shouldThrowOnTooManyDistinctIps() {
+        securityProperties.setMaxIpCount(2);
+
+        List<SystemEvent> events = List.of(
+                eventWithIp("127.0.0.1"),
+                eventWithIp("127.0.0.2"),
+                eventWithIp("127.0.0.3")
+        );
+
+        when(store.findByUserId(userId)).thenReturn(events);
+
+        SystemEvent newEvent = eventWithIp("127.0.0.4");
+
+        SystemException ex = assertThrows(SystemException.class, () -> service.secure(newEvent));
+        assertTrue(ex.getMessage().contains("Unusual IP pattern detected"));
+    }
+
+    @Test
+    @DisplayName("Should send UNUSUAL_BEHAVIOR when success follows a failure")
+    void secure_shouldSendUnusualBehaviorOnSuccessAfterFailure() throws Exception {
+        List<SystemEvent> events = List.of(
+                eventWithType(AUTHENTICATION_FAILURE),
+                eventWithType(AUTHENTICATION_SUCCESS)
+        );
+
+        when(store.findByUserId(userId)).thenReturn(events);
+
+        SystemEvent newEvent = eventWithType(AUTHENTICATION_SUCCESS);
+
+        service.secure(newEvent);
+
+        verify(producer, times(1)).sendEvent(argThat(ev ->
+                ev.getEventType() == KtxEvent.EventType.UNUSUAL_BEHAVIOR &&
+                        ev.getMessage().contains("Suspicious login success")
+        ));
+    }
+
+    private SystemEvent eventWithIp(String ip) {
+        return SystemEvent.builder()
+                .eventType(AUTHENTICATION_SUCCESS)
+                .timestamp(LocalDateTime.now())
+                .level(KtxEvent.Level.INFO)
+                .criticality(KtxEvent.Criticality.REGULAR)
+                .userId(userId)
+                .ipAddress(ip)
+                .message("Test")
+                .source("auth-service")
+                .build();
+    }
+
+    private SystemEvent eventWithType(KtxEvent.EventType type) {
+        return SystemEvent.builder()
+                .eventType(type)
+                .level(KtxEvent.Level.INFO)
+                .criticality(KtxEvent.Criticality.REGULAR)
+                .userId(userId)
+                .ipAddress("127.0.0.1")
+                .message("Test")
+                .source("auth-service")
+                .build();
+    }
+
+
     private SystemEvent event(KtxEvent.EventType type) {
         return SystemEvent.builder()
                 .eventType(type)
@@ -151,4 +216,6 @@ class SecurityServiceBehaviourTest {
                 .timestamp(LocalDateTime.now().plusMinutes(++timeDifference))
                 .build();
     }
+
+
 }
