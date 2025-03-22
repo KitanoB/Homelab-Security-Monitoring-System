@@ -21,14 +21,13 @@ import static org.mockito.Mockito.*;
 
 class SecurityServiceBehaviourTest {
 
+    private final String userId = "user-123";
     private SecurityEventStore<SystemEvent> store;
     private SecurityEventProducer producer;
     private SecurityService service;
     private SecurityProperties securityProperties;
     private UsualBehaviourProperties usualBehaviourProperties;
     private long timeDifference = 1;
-
-    private final String userId = "user-123";
 
     @BeforeEach
     void setup() {
