@@ -5,6 +5,7 @@ import com.kitano.core.model.SystemException;
 import ktx.kitano.security.service.application.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +40,7 @@ public class SecurityEventController {
             return ResponseEntity.status(201).body(savedEvent);
         } catch (SystemException e) {
             LOGGER.error("Error logging event: {}", e.getMessage(), e);
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.internalServerError().build();
         } catch (Exception e) {
             LOGGER.error("Unexpected error while logging event: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().build();
@@ -55,7 +56,7 @@ public class SecurityEventController {
     public ResponseEntity<List<SystemEvent>> getAllEvents() {
         LOGGER.info("Received request to get all events");
 
-        List<SystemEvent> events = eventService.findAll();
+        List<SystemEvent> events = eventService.findAllByOrder(Sort.Direction.DESC);
 
         if (events.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -101,6 +102,6 @@ public class SecurityEventController {
     @ExceptionHandler(SystemException.class)
     public ResponseEntity<String> handleSecurityEventException(SystemException e) {
         LOGGER.error("Handled SecurityEventException: {}", e.getMessage(), e);
-        return ResponseEntity.badRequest().body(e.getMessage());
+        return ResponseEntity.internalServerError().body(e.getMessage());
     }
 }

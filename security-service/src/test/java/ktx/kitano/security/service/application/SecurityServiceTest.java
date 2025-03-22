@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -33,15 +34,15 @@ class SecurityServiceTest {
 
     @BeforeEach
     void setUp() {
-        event = new SystemEvent(
-                KtxEvent.EventType.AUTHENTICATION_FAILURE,
-                KtxEvent.Level.WARNING,
-                KtxEvent.Criticality.REGULAR,
-                "550e8400-e29b-41d4-a716-446655440000",
-                "127.0.0.1",
-                "Failed login attempt",
-                "security-service"
-        );
+        event = SystemEvent.builder()
+                .eventType(KtxEvent.EventType.AUTHENTICATION_FAILURE)
+                .level(KtxEvent.Level.WARNING)
+                .criticality(KtxEvent.Criticality.REGULAR)
+                .userId("550e8400-e29b-41d4-a716-446655440000")
+                .ipAddress("127.0.0.1")
+                .message("Failed login attempt")
+                .source("security-service")
+                .build();
     }
 
     @Test
@@ -74,14 +75,14 @@ class SecurityServiceTest {
 
     @Test
     void getAllEvents_shouldReturnAllEvents() {
-        when(repository.findAll()).thenReturn(List.of(event));
+        when(repository.findAllByOrder(Sort.Direction.DESC)).thenReturn(List.of(event));
 
-        List<SystemEvent> result = service.findAll();
+        List<SystemEvent> result = service.findAllByOrder(Sort.Direction.DESC);
 
         assertEquals(1, result.size());
         assertEquals(event, result.get(0));
 
-        verify(repository, times(1)).findAll();
+        verify(repository, times(1)).findAllByOrder(Sort.Direction.DESC);
     }
 
     @Test

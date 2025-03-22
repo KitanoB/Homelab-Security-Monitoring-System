@@ -10,6 +10,7 @@ import ktx.kitano.security.service.infrastructure.repository.SecurityEventStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,7 +26,7 @@ import static com.kitano.iface.model.KtxEvent.EventType.AUTHENTICATION_SUCCESS;
 @Service
 public class SecurityService {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(SecurityService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityService.class);
 
     private final SecurityEventStore<SystemEvent> eventStore;
     private final SecurityEventProducer producer;
@@ -62,10 +63,10 @@ public class SecurityService {
      * <p>
      *
      * @param event the event to secure the system with
-     * @throws Exception if the event is null or if the system cannot be secured
+     * @throws SystemException if the event is null or if the system cannot be secured
      */
 
-    public void secure(SystemEvent event) throws Exception {
+    public void secure(SystemEvent event) throws SystemException {
         if (event == null) {
             throw new SystemException("Event cannot be null");
         }
@@ -102,19 +103,21 @@ public class SecurityService {
             throw new SystemException("Unusual IP pattern detected");
         }
 
+        SystemEvent.SystemEventBuilder eventBuilder = SystemEvent.builder();
+
         if (events.size() >= 2 &&
                 events.get(events.size() - 1).eventType() == AUTHENTICATION_SUCCESS &&
                 events.get(events.size() - 2).eventType() == AUTHENTICATION_FAILURE) {
             LOGGER.info("Suspicious login success after failure for user {}", event.getUserId());
-            producer.sendEvent(new SystemEvent(
-                    KtxEvent.EventType.UNUSUAL_BEHAVIOR,
-                    KtxEvent.Level.WARNING,
-                    KtxEvent.Criticality.REGULAR,
-                    event.getUserId(),
-                    event.getIpAddress(),
-                    "Suspicious login success after failure",
-                    "security-service"
-            ));
+            eventBuilder.eventType(KtxEvent.EventType.UNUSUAL_BEHAVIOR)
+                    .level(KtxEvent.Level.WARNING)
+                    .criticality(KtxEvent.Criticality.REGULAR)
+                    .userId(event.getUserId())
+                    .ipAddress(event.getIpAddress())
+                    .message("Suspicious login success after failure")
+                    .source("security-service");
+
+            producer.sendEvent(eventBuilder.build());
         }
 
         long recentUnusualBehaviorCount = events.stream()
@@ -127,15 +130,15 @@ public class SecurityService {
             LOGGER.warn("User {} has {} unusual behaviors in last {} days",
                     event.getUserId(), recentUnusualBehaviorCount, usualBehaviourProperties.getDays());
 
-            producer.sendEvent(new SystemEvent(
-                    KtxEvent.EventType.SECURITY,
-                    KtxEvent.Level.ERROR,
-                    KtxEvent.Criticality.CRITICAL,
-                    event.getUserId(),
-                    event.getIpAddress(),
-                    "Repeated unusual behavior detected",
-                    "security-service"
-            ));
+            eventBuilder.
+                    eventType(KtxEvent.EventType.SECURITY).
+                    level(KtxEvent.Level.ERROR).
+                    criticality(KtxEvent.Criticality.CRITICAL).
+                    userId(event.getUserId()).
+                    ipAddress(event.getIpAddress()).
+                    message("Repeated unusual behavior detected").
+                    source("security-service");
+            producer.sendEvent(eventBuilder.build());
         }
     }
 
@@ -159,8 +162,8 @@ public class SecurityService {
         return eventStore.findByType(eventType);
     }
 
-    public List<SystemEvent> findAll() {
-        return eventStore.findAll();
+    public List<SystemEvent> findAllByOrder(Sort.Direction direction) {
+        return eventStore.findAllByOrder(direction);
     }
 
     public SystemEvent findById(String id) {

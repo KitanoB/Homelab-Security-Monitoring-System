@@ -2,13 +2,19 @@ package com.kitano.core.model;
 
 import com.kitano.iface.model.KtxEvent;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "system_events")
 public class SystemEvent implements KtxEvent<String> {
 
@@ -18,7 +24,7 @@ public class SystemEvent implements KtxEvent<String> {
 
     @Version
     @Column(nullable = false)
-    private Long version = 0L;
+    private Long version;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime timestamp;
@@ -47,43 +53,14 @@ public class SystemEvent implements KtxEvent<String> {
     @Column(name = "source", nullable = false)
     private String source;
 
-    public SystemEvent() {
-    }
-
-    public SystemEvent(EventType eventType, Level level, Criticality criticality,
-                       String userId, String ipAddress, String message, String source) {
-        this.eventType = eventType;
-        this.level = level;
-        this.criticality = criticality;
-        this.userId = userId;
-        this.ipAddress = ipAddress;
-        this.message = message;
-        this.source = source;
-    }
-
-    public SystemEvent(String id, LocalDateTime timestamp, EventType eventType, Level level, Criticality criticality,
-                       String userId, String ipAddress, String message, String source) {
-        this.id = id;
-        this.timestamp = timestamp;
-        this.eventType = eventType;
-        this.level = Level.INFO;
-        this.criticality = Criticality.REGULAR;
-        this.userId = userId;
-        this.ipAddress = ipAddress;
-        this.message = message;
-        this.source = source;
-    }
-
     @PrePersist
     protected void onCreate() {
-        if (this.id == null) {
-            this.id = UUID.randomUUID().toString();
-        }
-        if (this.timestamp == null) {
-            this.timestamp = LocalDateTime.now();
-        }
+        if (this.id == null) this.id = UUID.randomUUID().toString();
+        if (this.timestamp == null) this.timestamp = LocalDateTime.now();
+        if (this.version == null) this.version = 0L;
     }
 
+    // KtxEvent interface implementation
     @Override
     public Level level() {
         return level;
@@ -121,7 +98,7 @@ public class SystemEvent implements KtxEvent<String> {
 
     @Override
     public String toString() {
-        return "SecurityEvent{" +
+        return "SystemEvent{" +
                 "id=" + id +
                 ", version=" + version +
                 ", timestamp=" + timestamp +
@@ -131,6 +108,7 @@ public class SystemEvent implements KtxEvent<String> {
                 ", userId='" + userId + '\'' +
                 ", ipAddress='" + ipAddress + '\'' +
                 ", message='" + message + '\'' +
+                ", source='" + source + '\'' +
                 '}';
     }
 }
