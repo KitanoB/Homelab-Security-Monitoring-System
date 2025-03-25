@@ -27,6 +27,7 @@
         <module>hexa-interface</module>
         <module>security-core</module>
         <module>security-service</module>
+        <module>security-auth-service</module>
     </modules>
     <scm>
         <connection/>
