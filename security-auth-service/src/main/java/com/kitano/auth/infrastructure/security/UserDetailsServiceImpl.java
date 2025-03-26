@@ -1,4 +1,4 @@
-package com.kitano.auth.security;
+package com.kitano.auth.infrastructure.security;
 
 import com.kitano.auth.infrastructure.repository.AuthJpaRepository;
 import com.kitano.core.model.HomeLabUser;
@@ -23,14 +23,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     /**
-     * Loads a user by username (email in our case).
+     * Loads a user by username (username in our case).
      */
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        HomeLabUser user = userRepository.findByEmail(email);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        HomeLabUser user = userRepository.findByUsername(username);
         if (user == null) {
-            LOGGER.warn("User not found with email: {}", email);
-            throw new UsernameNotFoundException("User Not Found with email: " + email);
+            LOGGER.warn("User not found with username: {}", user);
+            throw new UsernameNotFoundException("User Not Found with username: " + username);
         }
 
         return UserDetailsImpl.build(user);

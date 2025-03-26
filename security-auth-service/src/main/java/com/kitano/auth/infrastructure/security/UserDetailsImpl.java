@@ -1,4 +1,4 @@
-package com.kitano.auth.security;
+package com.kitano.auth.infrastructure.security;
 
 import com.kitano.core.model.HomeLabUser;
 import org.springframework.security.core.GrantedAuthority;

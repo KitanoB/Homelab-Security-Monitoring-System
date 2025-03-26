@@ -1,4 +1,4 @@
-package com.kitano.auth.infrastructure.model;
+package com.kitano.auth.model;
 
 
 import lombok.Data;

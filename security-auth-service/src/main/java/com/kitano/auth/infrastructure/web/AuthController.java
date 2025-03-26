@@ -1,7 +1,9 @@
 package com.kitano.auth.infrastructure.web;
 
 import com.kitano.auth.application.AuthService;
-import com.kitano.core.model.HomeLabUser;
+import com.kitano.auth.model.HomelabUserCreateDTO;
+import com.kitano.auth.model.HomelabUserDTO;
+import com.kitano.auth.model.UserLoginDTO;
 import com.kitano.core.model.SystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,89 +13,37 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * REST Controller for managing authentication.
- */
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthController.class);
 
-    private final AuthService eventService;
+    private final AuthService authService;
 
-    public AuthController(AuthService eventService) {
-        this.eventService = eventService;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
-    /**
-     * Logs a new security event.
-     *
-     * @param user The security event to log.
-     * @return The logged event with HTTP 201 Created.
-     */
     @PostMapping("/login")
-    public ResponseEntity<HomeLabUser> login(@RequestBody HomeLabUser user) {
-        LOGGER.info("Received request to log event: {}", user);
-
+    public ResponseEntity<?> login(@RequestBody UserLoginDTO loginRequest) {
         try {
-            HomeLabUser savedUser = eventService.authenticate(user);
-            return ResponseEntity.status(201).body(savedUser);
+            String token = authService.login(loginRequest);
+            return ResponseEntity.ok().body(token);
         } catch (SystemException e) {
-            LOGGER.error("Error logging event: {}", e.getMessage(), e);
-            return ResponseEntity.internalServerError().build();
-        } catch (Exception e) {
-            LOGGER.error("Unexpected error while logging event: {}", e.getMessage(), e);
-            return ResponseEntity.internalServerError().build();
+            LOGGER.warn("Login failed: {}", e.getMessage());
+            return ResponseEntity.status(401).body("Invalid username or password");
         }
     }
 
-    @PostMapping("/signin")
-    public ResponseEntity<HomeLabUser> signin(@RequestBody HomeLabUser user) {
-        LOGGER.info("Received request to log event: {}", user);
-
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody HomelabUserCreateDTO createDTO) {
         try {
-            HomeLabUser savedUser = eventService.authenticate(user);
-            return ResponseEntity.status(201).body(savedUser);
+            HomelabUserDTO registeredUser = authService.register(createDTO);
+            return ResponseEntity.status(201).body(registeredUser);
         } catch (SystemException e) {
-            LOGGER.error("Error logging event: {}", e.getMessage(), e);
-            return ResponseEntity.internalServerError().build();
-        } catch (Exception e) {
-            LOGGER.error("Unexpected error while logging event: {}", e.getMessage(), e);
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @PostMapping("/signout")
-    public ResponseEntity<HomeLabUser> signout(@RequestBody HomeLabUser user) {
-        LOGGER.info("Received request to log event: {}", user);
-
-        try {
-            HomeLabUser savedUser = eventService.authenticate(user);
-            return ResponseEntity.status(201).body(savedUser);
-        } catch (SystemException e) {
-            LOGGER.error("Error logging event: {}", e.getMessage(), e);
-            return ResponseEntity.internalServerError().build();
-        } catch (Exception e) {
-            LOGGER.error("Unexpected error while logging event: {}", e.getMessage(), e);
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @PostMapping("/ban")
-    public ResponseEntity<HomeLabUser> ban(@RequestBody HomeLabUser user) {
-        LOGGER.info("Received request to log event: {}", user);
-
-        try {
-            HomeLabUser savedUser = eventService.authenticate(user);
-            return ResponseEntity.status(201).body(savedUser);
-        } catch (SystemException e) {
-            LOGGER.error("Error logging event: {}", e.getMessage(), e);
-            return ResponseEntity.internalServerError().build();
-        } catch (Exception e) {
-            LOGGER.error("Unexpected error while logging event: {}", e.getMessage(), e);
-            return ResponseEntity.internalServerError().build();
+            LOGGER.warn("Register failed: {}", e.getMessage());
+            return ResponseEntity.status(400).body(e.getMessage());
         }
     }
 }

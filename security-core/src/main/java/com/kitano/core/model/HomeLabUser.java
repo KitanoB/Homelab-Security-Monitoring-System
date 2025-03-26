@@ -9,14 +9,18 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
-@NoArgsConstructor
 @Entity
+@NoArgsConstructor
 @Table(name = "users")
 public class HomeLabUser implements KtxUser {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID) // ou AUTO, si tu préfères
     private String id;
+
+    @Version
+    @Column(nullable = false)
+    private Long version = 0L;
 
     @Column(nullable = false)
     private String username;
@@ -30,11 +34,6 @@ public class HomeLabUser implements KtxUser {
     @Column(nullable = false)
     private LocalDateTime created;
 
-    public HomeLabUser(String username, String password, String role) {
-        this.username = username;
-        this.password = password;
-        this.role = role;
-    }
 
     @PrePersist
     protected void onCreate() {
@@ -43,6 +42,9 @@ public class HomeLabUser implements KtxUser {
         }
         if (this.created == null) {
             this.created = LocalDateTime.now();
+        }
+        if (this.version == null) {
+            this.version = 0L;
         }
     }
 }

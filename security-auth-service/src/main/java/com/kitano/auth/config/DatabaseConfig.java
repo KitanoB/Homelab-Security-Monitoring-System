@@ -1,5 +1,4 @@
-package com.kitano.auth.infrastructure.repository;
-
+package com.kitano.auth.config;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.persistence.EntityManagerFactory;
