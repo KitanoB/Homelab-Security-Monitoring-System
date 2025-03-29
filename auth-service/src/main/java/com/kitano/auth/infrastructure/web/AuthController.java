@@ -5,6 +5,7 @@ import com.kitano.auth.model.HomelabUserCreateDTO;
 import com.kitano.auth.model.HomelabUserDTO;
 import com.kitano.auth.model.UserLoginDTO;
 import com.kitano.core.model.SystemException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -25,25 +26,35 @@ public class AuthController {
         this.authService = authService;
     }
 
+    /**
+     * Handle login request and return a JWT if credentials are valid.
+     */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserLoginDTO loginRequest) {
+    public ResponseEntity<?> login(@RequestBody UserLoginDTO loginRequest, HttpServletRequest request) {
+        String ipAddress = request.getRemoteAddr();
+        loginRequest.setIpAddress(ipAddress);
         try {
             String token = authService.login(loginRequest);
-            return ResponseEntity.ok().body(token);
+            return ResponseEntity.ok(token);
         } catch (SystemException e) {
-            LOGGER.warn("Login failed: {}", e.getMessage());
+            LOGGER.warn("Login failed for user {} from IP {}: {}", loginRequest.getUsername(), ipAddress, e.getMessage());
             return ResponseEntity.status(401).body("Invalid username or password");
         }
     }
 
+    /**
+     * Register a new user.
+     */
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody HomelabUserCreateDTO createDTO) {
+    public ResponseEntity<?> register(@RequestBody HomelabUserCreateDTO createDTO, HttpServletRequest request) {
+        String ipAddress = request.getRemoteAddr();
+        createDTO.setIpAddress(ipAddress);
         try {
             HomelabUserDTO registeredUser = authService.register(createDTO);
             return ResponseEntity.status(201).body(registeredUser);
         } catch (SystemException e) {
-            LOGGER.warn("Register failed: {}", e.getMessage());
-            return ResponseEntity.status(400).body(e.getMessage());
+            LOGGER.warn("Registration failed from IP {}: {}", ipAddress, e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

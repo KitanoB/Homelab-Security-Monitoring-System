@@ -43,25 +43,25 @@ public class AuthService {
     }
 
     public String login(UserLoginDTO loginRequest) throws SystemException {
-        LOGGER.info("Login attempt for user {}", loginRequest.username());
+        LOGGER.info("Login attempt for user {}", loginRequest.getUsername());
 
-        HomeLabUser user = authUserJpaRepository.findByUsername(loginRequest.username());
+        HomeLabUser user = authUserJpaRepository.findByUsername(loginRequest.getUsername());
 
         if (user == null) {
-            LOGGER.error("User not found: {}", loginRequest.username());
+            LOGGER.error("User not found: {}", loginRequest.getUsername());
             logEvent(null, KtxEvent.EventType.AUTHENTICATION_FAILURE, "User not found");
             throw new SystemException("User not found");
         }
 
-        if (!passwordService.matches(loginRequest.password(), user.getPassword())) {
-            LOGGER.error("Invalid credentials for user {}", loginRequest.username());
+        if (!passwordService.matches(loginRequest.getPassword(), user.getPassword())) {
+            LOGGER.error("Invalid credentials for user {}", loginRequest.getUsername());
             logEvent(user, KtxEvent.EventType.AUTHENTICATION_FAILURE, "Bad credentials");
             throw new SystemException("Invalid credentials");
         }
 
         logEvent(user, KtxEvent.EventType.AUTHENTICATION_SUCCESS, "Login successful");
 
-        LOGGER.info("User {} logged in", loginRequest.username());
+        LOGGER.info("User {} logged in", loginRequest.getUsername());
         return jwtUtils.generateToken(UserMapper.toDto(user));
     }
 

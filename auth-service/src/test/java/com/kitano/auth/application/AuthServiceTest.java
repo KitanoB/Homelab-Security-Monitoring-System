@@ -56,7 +56,7 @@ class AuthServiceTest {
 
     @Test
     void login_shouldReturnJwtToken_onSuccess() throws SystemException {
-        UserLoginDTO loginDTO = new UserLoginDTO(username, rawPassword);
+        UserLoginDTO loginDTO = new UserLoginDTO(username, rawPassword, "127.0.0.1");
 
         when(userRepository.findByUsername(username)).thenReturn(user);
         when(passwordEncoder.matches(rawPassword, hashedPassword)).thenReturn(true);
@@ -72,7 +72,7 @@ class AuthServiceTest {
 
     @Test
     void login_shouldThrow_whenPasswordInvalid() {
-        UserLoginDTO loginDTO = new UserLoginDTO(username, rawPassword);
+        UserLoginDTO loginDTO = new UserLoginDTO(username, rawPassword, "127.0.0.1");
 
         when(userRepository.findByUsername(username)).thenReturn(user);
         when(passwordEncoder.matches(rawPassword, hashedPassword)).thenReturn(false);
