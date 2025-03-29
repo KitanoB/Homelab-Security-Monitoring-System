@@ -63,18 +63,6 @@ class SecurityEventControllerTest {
     }
 
     @Test
-    @DisplayName("Should return 500 if logEvent throws SystemException")
-    void logEvent_shouldReturn500OnException() throws Exception {
-        doThrow(new SystemException("fail")).when(eventService).logEvent(event);
-
-        ResponseEntity<SystemEvent> response = controller.logEvent(event);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals(null, response.getBody());
-        verify(eventService, times(1)).logEvent(event);
-    }
-
-    @Test
     @DisplayName("Should return all events in descending order")
     void getAllEvents() {
         List<SystemEvent> events = List.of(event);

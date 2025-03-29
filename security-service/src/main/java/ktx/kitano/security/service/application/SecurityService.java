@@ -1,7 +1,6 @@
 package ktx.kitano.security.service.application;
 
 import com.kitano.core.model.SystemEvent;
-import com.kitano.core.model.SystemException;
 import com.kitano.iface.model.KtxEvent;
 import ktx.kitano.security.service.config.SecurityProperties;
 import ktx.kitano.security.service.config.UnusualBehaviourProperties;
@@ -63,13 +62,9 @@ public class SecurityService {
      * <p>
      *
      * @param event the event to secure the system with
-     * @throws SystemException if the event is null or if the system cannot be secured
      */
 
-    public void secure(SystemEvent event) throws SystemException {
-        if (event == null) {
-            throw new SystemException("Event cannot be null");
-        }
+    public void secure(SystemEvent event) {
 
         List<SystemEvent> events = eventStore.findByUserId(event.getUserId());
         if (events == null || events.isEmpty()) return;
@@ -81,7 +76,15 @@ public class SecurityService {
 
             if (previousSuccesses && KtxEvent.EventType.AUTHENTICATION_FAILURE.equals(event.eventType())) {
                 LOGGER.info("User {} has an unusual login pattern", event.getUserId());
-                throw new SystemException("User has an unusual login pattern");
+                SystemEvent.SystemEventBuilder eventBuilder = SystemEvent.builder()
+                        .eventType(KtxEvent.EventType.UNUSUAL_BEHAVIOR)
+                        .level(KtxEvent.Level.WARNING)
+                        .criticality(KtxEvent.Criticality.REGULAR)
+                        .userId(event.getUserId())
+                        .ipAddress(event.getIpAddress())
+                        .message("Unusual login pattern detected")
+                        .source("security-service");
+                logEvent(eventBuilder.build());
             }
         }
 
@@ -90,7 +93,15 @@ public class SecurityService {
 
         if (onlyFailures && KtxEvent.EventType.AUTHENTICATION_FAILURE.equals(event.eventType())) {
             LOGGER.info("User {} has reached the maximum number of failed login attempts", event.getUserId());
-            throw new SystemException("User has reached the maximum number of failed login attempts");
+            SystemEvent.SystemEventBuilder eventBuilder = SystemEvent.builder()
+                    .eventType(KtxEvent.EventType.UNUSUAL_BEHAVIOR)
+                    .level(KtxEvent.Level.WARNING)
+                    .criticality(KtxEvent.Criticality.REGULAR)
+                    .userId(event.getUserId())
+                    .ipAddress(event.getIpAddress())
+                    .message("Maximum number of failed login attempts reached")
+                    .source("security-service");
+            logEvent(eventBuilder.build());
         }
 
         long ipCount = events.stream()
@@ -100,7 +111,16 @@ public class SecurityService {
 
         if (ipCount > securityProperties.getMaxIpCount()) {
             LOGGER.warn("Unusual IP activity for user {}", event.getUserId());
-            throw new SystemException("Unusual IP pattern detected");
+            SystemEvent.SystemEventBuilder eventBuilder = SystemEvent.builder()
+                    .eventType(KtxEvent.EventType.UNUSUAL_BEHAVIOR)
+                    .level(KtxEvent.Level.WARNING)
+                    .criticality(KtxEvent.Criticality.REGULAR)
+                    .userId(event.getUserId())
+                    .ipAddress(event.getIpAddress())
+                    .message("Unusual IP activity detected")
+                    .source("security-service");
+
+            logEvent(eventBuilder.build());
         }
 
         SystemEvent.SystemEventBuilder eventBuilder = SystemEvent.builder();
@@ -117,7 +137,7 @@ public class SecurityService {
                     .message("Suspicious login success after failure")
                     .source("security-service");
 
-            producer.sendEvent(eventBuilder.build());
+            logEvent(eventBuilder.build());
         }
 
         long recentUnusualBehaviorCount = events.stream()
@@ -138,7 +158,7 @@ public class SecurityService {
                     ipAddress(event.getIpAddress()).
                     message("Repeated unusual behavior detected").
                     source("security-service");
-            producer.sendEvent(eventBuilder.build());
+            logEvent(eventBuilder.build());
         }
     }
 
@@ -147,14 +167,16 @@ public class SecurityService {
      *
      * @param event the event to log
      * @return the saved event
-     * @throws Exception if the event is null
      */
-    public SystemEvent logEvent(SystemEvent event) throws Exception {
-        if (event == null) {
-            throw new SystemException("Event cannot be null");
+    public SystemEvent logEvent(SystemEvent event) {
+        SystemEvent savedEvent = null;
+        try {
+            savedEvent = eventStore.save(event);
+            producer.sendEvent(savedEvent);
+        } catch (Exception e) {
+            LOGGER.error("Failed to log event: {}", e.getMessage());
+            return null;
         }
-        SystemEvent savedEvent = eventStore.save(event);
-        producer.sendEvent(savedEvent);
         return savedEvent;
     }
 
