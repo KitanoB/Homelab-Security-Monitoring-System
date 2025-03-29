@@ -49,17 +49,17 @@ public class AuthService {
 
         if (user == null) {
             LOGGER.error("User not found: {}", loginRequest.getUsername());
-            logEvent(null, KtxEvent.EventType.AUTHENTICATION_FAILURE, "User not found");
+            logEvent(null, KtxEvent.EventType.AUTHENTICATION_FAILURE, "User not found", loginRequest.getIpAddress());
             throw new SystemException("User not found");
         }
 
         if (!passwordService.matches(loginRequest.getPassword(), user.getPassword())) {
             LOGGER.error("Invalid credentials for user {}", loginRequest.getUsername());
-            logEvent(user, KtxEvent.EventType.AUTHENTICATION_FAILURE, "Bad credentials");
+            logEvent(user, KtxEvent.EventType.AUTHENTICATION_FAILURE, "Bad credentials", loginRequest.getIpAddress());
             throw new SystemException("Invalid credentials");
         }
 
-        logEvent(user, KtxEvent.EventType.AUTHENTICATION_SUCCESS, "Login successful");
+        logEvent(user, KtxEvent.EventType.AUTHENTICATION_SUCCESS, "Login successful", loginRequest.getIpAddress());
 
         LOGGER.info("User {} logged in", loginRequest.getUsername());
         return jwtUtils.generateToken(UserMapper.toDto(user));
@@ -82,20 +82,20 @@ public class AuthService {
 
         HomeLabUser saved = authUserJpaRepository.save(user);
 
-        logEvent(saved, KtxEvent.EventType.USER_ACTION, "User created");
+        logEvent(saved, KtxEvent.EventType.USER_ACTION, "User created", dto.getIpAddress());
 
         LOGGER.info("User {} registered", dto.getUsername());
         return UserMapper.toDto(saved);
     }
 
-    private void logEvent(HomeLabUser user, KtxEvent.EventType type, String message) {
+    private void logEvent(HomeLabUser user, KtxEvent.EventType type, String message, String ip) {
         SystemEvent event = SystemEvent.builder()
                 .userId(user != null ? user.getId() : "unknown user")
                 .eventType(type)
                 .message(message)
                 .criticality(KtxEvent.Criticality.REGULAR)
                 .level(KtxEvent.Level.INFO)
-                .ipAddress("127.0.0.1")
+                .ipAddress(ip)
                 .source("auth-service")
                 .timestamp(LocalDateTime.now())
                 .version(0L)
