@@ -1,0 +1,28 @@
+# .github/ISSUE_TEMPLATE/config.yml
+
+blank_issues_enabled: false
+contact_links: []
+
+# Auto-add issues to GitHub Project (Sprint Board)
+projects:
+  - url: https://github.com/users/KitanoB/projects/4
+
+# Default field values to apply when an issue is added to the project
+# These must match your custom fields exactly (case-sensitive)
+# You can override them in the issue form using dropdown fields
+defaults:
+  fields:
+    Status: "To Do"
+    Priority: "Medium"
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this issue?
+      options:
+        - High
+        - Medium
+        - Low
+    validations:
+      required: true
