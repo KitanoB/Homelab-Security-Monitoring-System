@@ -1,6 +1,6 @@
 # Homelab Security Monitoring System
 
-<img src="./docs/images/homelab.png" alt="logo" width="200" height="200"/>
+<img src="DOCS/IMAGES/homelab.png" alt="logo" width="200" height="200"/>
 
 ## Overview
 
@@ -26,7 +26,7 @@ business logic and external dependencies.
 - High testability by allowing easy replacement of external dependencies with mocks.
 - Better maintainability and scalability, especially in microservices.
 
-<img src="./docs/images/Hexagonal_Architecture.png" alt="drawing" width="200" height="200"/>
+<img src="DOCS/IMAGES/Hexagonal_Architecture.png" alt="drawing" width="200" height="200"/>
 
 ### **Core Principles:**
 
@@ -83,12 +83,26 @@ security-audit-service/
 
 ---
 
-## **Next Steps**
+## **Contributing**
 
-- [ ] Set up the **Security Audit Service** with Hexagonal Architecture.
-- [ ] Implement **Kafka Producer** to publish security events.
-- [ ] Build the **Notification Service** to listen for security alerts.
-- [ ] Automate testing and deployment with **GitHub Actions & OpenShift**.
+Interested in the process or thinking of contributing?  
+→ [See CONTRIBUTING.md](CONTRIBUTING.md)
+
+---
+
+## **Project Workflow**
+
+This project applies a professional Git workflow based on issue-driven development.
+
+-  Each branch starts from `main`
+-  Work is grouped into:
+   - `feature/<short-desc>`
+   - `bug/<short-desc>`
+   - `task/<short-desc>`
+-  All branches go through a Pull Request before merging
+-  Issues and PRs are cross-linked (`Closes #42`)
+
+See full [Branching Convention](./BRANCHING_CONVENTION.md)
 
 ---
 
