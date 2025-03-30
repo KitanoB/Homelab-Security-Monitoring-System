@@ -26,7 +26,7 @@ public class SecurityEventProducer {
     public boolean sendEvent(SystemEvent event) {
         Message<SystemEvent> message = MessageBuilder
                 .withPayload(event)
-                .setHeader("kafka_topic", "auth-events")
+                .setHeader("kafka_topic", "security-events")
                 .build();
 
         CompletableFuture<SendResult<String, SystemEvent>> future = kafka.send(message);

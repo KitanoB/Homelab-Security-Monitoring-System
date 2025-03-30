@@ -34,17 +34,12 @@ public class SecurityEventController {
     @PostMapping("/log")
     public ResponseEntity<SystemEvent> logEvent(@RequestBody SystemEvent event) {
         LOGGER.info("Received request to log event: {}", event);
-
-        try {
-            SystemEvent savedEvent = eventService.logEvent(event);
-            return ResponseEntity.status(201).body(savedEvent);
-        } catch (SystemException e) {
-            LOGGER.error("Error logging event: {}", e.getMessage(), e);
-            return ResponseEntity.internalServerError().build();
-        } catch (Exception e) {
-            LOGGER.error("Unexpected error while logging event: {}", e.getMessage(), e);
+        SystemEvent savedEvent = eventService.logEvent(event);
+        if (savedEvent == null) {
+            LOGGER.error("Failed to log event: {}", event);
             return ResponseEntity.internalServerError().build();
         }
+        return ResponseEntity.status(201).body(savedEvent);
     }
 
     /**

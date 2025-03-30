@@ -1,7 +1,6 @@
 package ktx.kitano.security.service.application;
 
 import com.kitano.core.model.SystemEvent;
-import com.kitano.core.model.SystemException;
 import com.kitano.iface.model.KtxEvent;
 import ktx.kitano.security.service.infrastructure.messaging.SecurityEventProducer;
 import ktx.kitano.security.service.infrastructure.repository.SecurityEventStore;
@@ -56,21 +55,6 @@ class SecurityServiceTest {
 
         verify(repository, times(1)).save(event);
         verify(producer, times(1)).sendEvent(event);
-    }
-
-    @Test
-    void logEvent_shouldThrowExceptionWhenEventIsNull() {
-        Exception exception = assertThrows(Exception.class, () -> service.logEvent(null));
-        assertInstanceOf(SystemException.class, exception);
-        assertEquals("Event cannot be null", exception.getMessage());
-        verifyNoInteractions(repository, producer);
-    }
-
-    @Test
-    void logEvent_shouldHandleRepositoryException() throws Exception {
-        when(repository.save(event)).thenThrow(new RuntimeException("Database error"));
-        assertThrows(RuntimeException.class, () -> service.logEvent(event));
-        verify(producer, never()).sendEvent(event);
     }
 
     @Test

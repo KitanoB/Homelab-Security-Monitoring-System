@@ -1,50 +1,48 @@
 # .github/labels.yml
-# Define custom labels for tasks, bugs, components, priorities
 
-labels:
-  # Priority
-  - name: "priority: high"
-    color: "ff4d4d"
-    description: "Urgent or blocking issue"
+# Priority
+- name: "priority: high"
+  color: "ff4d4d"
+  description: "Urgent or blocking issue"
 
-  - name: "priority: medium"
-    color: "ffcc00"
-    description: "Important but not urgent"
+- name: "priority: medium"
+  color: "ffcc00"
+  description: "Important but not urgent"
 
-  - name: "priority: low"
-    color: "8cd98c"
-    description: "Minor improvement or nice-to-have"
+- name: "priority: low"
+  color: "8cd98c"
+  description: "Minor improvement or nice-to-have"
 
-  # Type
-  - name: "bug"
-    color: "d73a4a"
-    description: "Something isn’t working"
+# Type
+- name: "bug"
+  color: "d73a4a"
+  description: "Something isn’t working"
 
-  - name: "enhancement"
-    color: "a2eeef"
-    description: "New feature or improvement"
+- name: "enhancement"
+  color: "a2eeef"
+  description: "New feature or improvement"
 
-  - name: "task"
-    color: "cccccc"
-    description: "Internal work, technical debt, CI..."
+- name: "task"
+  color: "cccccc"
+  description: "Internal work, technical debt, CI..."
 
-  - name: "docs"
-    color: "0075ca"
-    description: "Documentation work"
+- name: "docs"
+  color: "0075ca"
+  description: "Documentation work"
 
-  # Component
-  - name: "auth"
-    color: "5b5fc7"
-    description: "Authentication and security logic"
+# Component
+- name: "auth"
+  color: "5b5fc7"
+  description: "Authentication and security logic"
 
-  - name: "api"
-    color: "b392f0"
-    description: "REST API or backend logic"
+- name: "api"
+  color: "b392f0"
+  description: "REST API or backend logic"
 
-  - name: "ui"
-    color: "f9d423"
-    description: "Frontend or presentation layer"
+- name: "ui"
+  color: "f9d423"
+  description: "Frontend or presentation layer"
 
-  - name: "infra"
-    color: "808080"
-    description: "CI/CD, deployment, Docker"
+- name: "infra"
+  color: "808080"
+  description: "CI/CD, deployment, Docker"

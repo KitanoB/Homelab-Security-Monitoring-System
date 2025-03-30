@@ -22,11 +22,12 @@
         <developer/>
     </developers>
     <modules>
-        <module>security-notification-service</module>
-        <module>security-dashboard</module>
-        <module>ktx-interface</module>
-        <module>security-core</module>
+        <module>notification-service</module>
+        <module>dashboard</module>
+        <module>hexa-interface</module>
+        <module>homelab-core</module>
         <module>security-service</module>
+        <module>auth-service</module>
     </modules>
     <scm>
         <connection/>

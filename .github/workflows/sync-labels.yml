@@ -1,9 +1,15 @@
 name: Sync Labels
 
+# Trigger on push to labels.yml
 on:
   push:
     paths:
       - ".github/labels.yml"
+
+permissions:
+  contents: read
+  issues: write 
+  metadata: read
 
 jobs:
   sync-labels:
