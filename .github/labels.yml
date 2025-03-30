@@ -1,6 +1,4 @@
 # .github/labels.yml
-
-# Priority
 - name: "priority: high"
   color: "ff4d4d"
   description: "Urgent or blocking issue"
@@ -13,7 +11,6 @@
   color: "8cd98c"
   description: "Minor improvement or nice-to-have"
 
-# Type
 - name: "bug"
   color: "d73a4a"
   description: "Something isn’t working"
@@ -30,7 +27,6 @@
   color: "0075ca"
   description: "Documentation work"
 
-# Component
 - name: "auth"
   color: "5b5fc7"
   description: "Authentication and security logic"
