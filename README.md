@@ -109,3 +109,7 @@ See full [Branching Convention](./BRANCHING_CONVENTION.md)
 This project serves as a **real-world demonstration of security monitoring**, event-driven systems, and **best practices
 in microservices architecture with Hexagonal design**. 🚀
 
+## **License**
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+```
+
