@@ -1,0 +1,44 @@
+name: Technical Task
+description: Internal technical work (refactor, CI, etc.)
+title: "[Task] <Short Description>"
+labels: ["task"]
+projects: ["https://github.com/users/KitanoB/projects/4"]
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+    validations:
+      required: true
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - High
+        - Medium
+        - Low
+    validations:
+      required: true
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options:
+        - Task
+    validations:
+      required: true

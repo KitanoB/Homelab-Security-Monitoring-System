@@ -24,7 +24,7 @@
     <modules>
         <module>security-notification-service</module>
         <module>security-dashboard</module>
-        <module>hexa-interface</module>
+        <module>ktx-interface</module>
         <module>security-core</module>
         <module>security-service</module>
     </modules>
