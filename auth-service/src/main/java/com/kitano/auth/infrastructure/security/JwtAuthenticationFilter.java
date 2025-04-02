@@ -28,17 +28,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
-
+        System.out.println("JwtAuthenticationFilter triggered for: " + request.getRequestURI());
         String token = extractToken(request);
-        if (token != null && jwtUtils.validateToken(token)) {
-            String username = jwtUtils.getUsernameFromToken(token);
-            HomeLabUser user = userRepository.findByUsername(username);
 
-            if (user != null) {
-                var auth = new UsernamePasswordAuthenticationToken(
-                        username, null, Collections.emptyList()
-                );
-                SecurityContextHolder.getContext().setAuthentication(auth);
+        // Validate the token and set the authentication in the context
+        if (token != null ) {
+            if (jwtUtils.isBlacklisted(token)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\": \"Token has been invalidated. \"}");
+                return;
+            }
+
+            if (jwtUtils.validateToken(token)) {
+                String username = jwtUtils.getUsernameFromToken(token);
+                HomeLabUser user = userRepository.findByUsername(username);
+                if (user != null) {
+                    var auth = new UsernamePasswordAuthenticationToken(
+                            username, null, Collections.emptyList()
+                    );
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\": \"Invalid or expired token\"}");
+                return;
             }
         }
 

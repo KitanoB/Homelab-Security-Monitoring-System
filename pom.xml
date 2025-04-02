@@ -24,7 +24,7 @@
     <modules>
         <module>notification-service</module>
         <module>dashboard</module>
-        <module>hexa-interface</module>
+        <module>ktx-interface</module>
         <module>homelab-core</module>
         <module>security-service</module>
         <module>auth-service</module>

@@ -14,7 +14,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import javax.sql.DataSource;
 
 @EnableKafka
-@SpringBootApplication(scanBasePackages = {"com.kitano.auth", "com.kitano.core"})
+@SpringBootApplication(scanBasePackages = {"com.kitano.auth", "com.kitano.core", "com.kitano.auth.infrastructure.security"})
 @EntityScan(basePackages = "com.kitano.core.model")
 @EnableJpaRepositories(basePackages = "com.kitano.auth.infrastructure.repository")
 public class AuthServiceApplication {
