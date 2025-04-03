@@ -29,7 +29,7 @@ import java.time.LocalDateTime;
 
 /**
  * Service class for handling authentication-related operations.
- *
+ * <p>
  * This class provides methods for user login, registration, and logout.
  * It also handles event logging for authentication actions.
  */
@@ -187,5 +187,39 @@ public class AuthService {
         LOGGER.debug("Sending event: {}", event);
         producer.sendEvent(event);
         authEventJpaRepository.save(event);
+    }
+
+    /**
+     * Bans a user by setting their status to banned.
+     *
+     * @param userId the ID of the user to ban
+     * @throws SystemException if the user is not found
+     */
+    @Transactional
+    public void banUser(String userId) throws SystemException {
+        LOGGER.info("Banning user {}", userId);
+        HomeLabUser user = authUserJpaRepository.findById(userId)
+                .orElseThrow(() -> new SystemException("User not found"));
+        user.setBan(true);
+        authUserJpaRepository.save(user);
+        logEvent(user, KtxEvent.EventType.USER_ACTION, "User banned", user.getUsername());
+        LOGGER.info("User {} banned", userId);
+    }
+
+    /**
+     * Unbans a user by removing their ban status.
+     *
+     * @param userId the ID of the user to unban
+     * @throws SystemException if the user is not found
+     */
+    @Transactional
+    public void unbanUser(String userId) throws SystemException {
+        LOGGER.info("Unbanning user {}", userId);
+        HomeLabUser user = authUserJpaRepository.findById(userId)
+                .orElseThrow(() -> new SystemException("User not found"));
+        user.setBan(false);
+        authUserJpaRepository.save(user);
+        logEvent(user, KtxEvent.EventType.USER_ACTION, "User unbanned", user.getUsername());
+        LOGGER.info("User {} unbanned", userId);
     }
 }

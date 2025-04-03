@@ -1,7 +1,7 @@
 # .github/ISSUE_TEMPLATE/config.yml
 
 blank_issues_enabled: false
-contact_links: []
+contact_links: [ ]
 
 # Auto-add issues to GitHub Project (Sprint Board)
 projects:
@@ -15,14 +15,14 @@ defaults:
     Status: "To Do"
     Priority: "Medium"
 
-  - type: dropdown
-    id: priority
-    attributes:
-      label: Priority
-      description: How urgent is this issue?
-      options:
-        - High
-        - Medium
-        - Low
-    validations:
-      required: true
+    - type: dropdown
+      id: priority
+      attributes:
+        label: Priority
+        description: How urgent is this issue?
+        options:
+          - High
+          - Medium
+          - Low
+      validations:
+        required: true

@@ -111,6 +111,37 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/ban")
+    public ResponseEntity<?> banUser(@RequestBody String userId, HttpServletRequest request) {
+        LOGGER.info("Banning user with ID: {}", userId);
+        if (!isAdmin(request)) {
+            return ResponseEntity.badRequest().body("Role ADMIN required");
+        }
+        try {
+            authService.banUser(userId);
+            return ResponseEntity.ok("User banned successfully");
+        } catch (SystemException e) {
+            LOGGER.error("Error while banning user: {}", e.getMessage());
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+    }
+
+    @PostMapping
+    @RequestMapping("/unban")
+    public ResponseEntity<?> unbanUser(@RequestBody String userId, HttpServletRequest request) {
+        LOGGER.info("Unbanning user with ID: {}", userId);
+        if (!isAdmin(request)) {
+            return ResponseEntity.badRequest().body("Role ADMIN required");
+        }
+        try {
+            authService.unbanUser(userId);
+            return ResponseEntity.ok("User unbanned successfully");
+        } catch (SystemException e) {
+            LOGGER.error("Error while unbanning user: {}", e.getMessage());
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+    }
+
     /**
      * Check if the user is allowed to access the events.
      * To be allowed, the user must be authenticated and have the role "ADMIN".

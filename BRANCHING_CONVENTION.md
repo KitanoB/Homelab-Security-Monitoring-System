@@ -1,6 +1,8 @@
 # Branching Convention
 
-This document defines the Git branching strategy used in this project. It ensures clarity, consistency, and traceability across all contributions — even for a solo project. This approach is inspired by professional-grade workflows, adapted for solo and small-team development.
+This document defines the Git branching strategy used in this project. It ensures clarity, consistency, and traceability
+across all contributions — even for a solo project. This approach is inspired by professional-grade workflows, adapted
+for solo and small-team development.
 
 ---
 
@@ -16,13 +18,13 @@ This document defines the Git branching strategy used in this project. It ensure
 
 ## Branch Types & Naming Convention
 
-| Type      | Branch Pattern               | Example                         |
-|-----------|------------------------------|----------------------------------|
-| Feature   | `feature/<short-desc>`       | `feature/user-authentication`   |
-| Bug Fix   | `bug/<short-desc>`           | `bug/fix-token-expiry`          |
-| Task      | `task/<short-desc>`          | `task/setup-ci-pipeline`        |
-| Refactor  | `refactor/<short-desc>`      | `refactor/extract-token-utils`  |
-| Docs      | `docs/<short-desc>`          | `docs/update-readme`            |
+| Type     | Branch Pattern          | Example                        |
+|----------|-------------------------|--------------------------------|
+| Feature  | `feature/<short-desc>`  | `feature/user-authentication`  |
+| Bug Fix  | `bug/<short-desc>`      | `bug/fix-token-expiry`         |
+| Task     | `task/<short-desc>`     | `task/setup-ci-pipeline`       |
+| Refactor | `refactor/<short-desc>` | `refactor/extract-token-utils` |
+| Docs     | `docs/<short-desc>`     | `docs/update-readme`           |
 
 - Use `kebab-case` for readability
 - Keep branch names short but descriptive
@@ -39,9 +41,11 @@ This document defines the Git branching strategy used in this project. It ensure
 ## Workflow Steps
 
 ### 1. Create or choose an issue
+
 Every branch starts with a GitHub issue (Bug, Feature, or Task).
 
 ### 2. Create your branch from `main`
+
 ```bash
 git checkout main
 git pull

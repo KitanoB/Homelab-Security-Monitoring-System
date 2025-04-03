@@ -1,18 +1,20 @@
-#  Contributing Guidelines
+# Contributing Guidelines
 
-Welcome! This project is a personal initiative to explore professional software development practices in a homelab environment. Even though it's a solo project, contributions (even from myself) follow a clean, structured process — just like in a real-world team.
+Welcome! This project is a personal initiative to explore professional software development practices in a homelab
+environment. Even though it's a solo project, contributions (even from myself) follow a clean, structured process — just
+like in a real-world team.
 
 ---
 
-##  Issue Types
+## Issue Types
 
 Before starting any work, create or link an appropriate issue. The project uses three types of issues:
 
-| Type     | Purpose                                                                 |
-|----------|-------------------------------------------------------------------------|
-|  Bug      | A defect or unexpected behavior in the system                        |
-|  Feature  | A new capability or improvement that adds value                      |
-|  Task    | Technical or internal work not directly visible to users             |
+| Type    | Purpose                                                  |
+|---------|----------------------------------------------------------|
+| Bug     | A defect or unexpected behavior in the system            |
+| Feature | A new capability or improvement that adds value          |
+| Task    | Technical or internal work not directly visible to users |
 
 You can start with an issue template using the **"New Issue"** button on GitHub.
 
@@ -66,6 +68,7 @@ Every PR should:
 
 ## Final Note
 
-This repository reflects my goal to maintain the same quality standards found in team environments — clean code, traceable decisions, and a documented process.
+This repository reflects my goal to maintain the same quality standards found in team environments — clean code,
+traceable decisions, and a documented process.
 
 Thanks for reading — now go build something awesome.  

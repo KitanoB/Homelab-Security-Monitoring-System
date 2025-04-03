@@ -37,11 +37,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
      * This method is called for every request to check if the user is authenticated.
      * It extracts the JWT token from the request and validates it.
      *
-     * @param request  The HttpServletRequest object.
-     * @param response The HttpServletResponse object.
+     * @param request     The HttpServletRequest object.
+     * @param response    The HttpServletResponse object.
      * @param filterChain The FilterChain object.
      * @throws ServletException If a servlet error occurs.
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException      If an I/O error occurs.
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request,

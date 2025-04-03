@@ -40,7 +40,6 @@ public class HomeLabUser implements KtxUser {
     private boolean enabled = true;
 
 
-
     @PrePersist
     protected void onCreate() {
         if (this.id == null) {

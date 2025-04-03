@@ -1,8 +1,8 @@
 name: Bug Report
 description: Report something that is not working as expected
 title: "[Bug] <Short Description>"
-labels: ["bug"]
-projects: ["https://github.com/users/KitanoB/projects/4"]
+labels: [ "bug" ]
+projects: [ "https://github.com/users/KitanoB/projects/4" ]
 body:
   - type: textarea
     id: description
