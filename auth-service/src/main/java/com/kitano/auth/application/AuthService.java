@@ -13,6 +13,7 @@ import com.kitano.core.model.HomeLabUser;
 import com.kitano.core.model.SystemEvent;
 import com.kitano.core.model.SystemException;
 import com.kitano.iface.model.KtxEvent;
+import com.kitano.iface.model.KtxRole;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -25,10 +26,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Service class for handling authentication-related operations.
- *
+ * <p>
  * This class provides methods for user login, registration, and logout.
  * It also handles event logging for authentication actions.
  */
@@ -79,6 +82,10 @@ public class AuthService {
             LOGGER.error("Invalid credentials for user {}", loginRequest.getUsername());
             logEvent(user, KtxEvent.EventType.AUTHENTICATION_FAILURE, "Bad credentials", loginRequest.getIpAddress());
             throw new SystemException("Invalid credentials");
+        } else if (user.isBan()) {
+            LOGGER.error("User {} is banned", loginRequest.getUsername());
+            logEvent(user, KtxEvent.EventType.AUTHENTICATION_FAILURE, "User is banned", loginRequest.getIpAddress());
+            throw new SystemException("User is banned");
         }
 
         logEvent(user, KtxEvent.EventType.AUTHENTICATION_SUCCESS, "Login successful", loginRequest.getIpAddress());
@@ -104,10 +111,33 @@ public class AuthService {
             throw new SystemException("Username already in use");
         }
 
+        // Check if the IP address is already in use
+        // and if the user is banned
+        if (authEventJpaRepository.existsByIpAddress(dto.getIpAddress())) {
+
+            List<SystemEvent> events = authEventJpaRepository.findByIpAddress(dto.getIpAddress());
+            List<String> userId = events.stream()
+                    .map(SystemEvent::getUserId)
+                    .distinct()
+                    .toList();
+
+            if (!userId.isEmpty()) {
+                boolean isSuspicious = userId.stream().map(
+                        authUserJpaRepository::findById).filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .anyMatch(HomeLabUser::isBan);
+
+                if (isSuspicious) {
+                    LOGGER.error("IP address {} is already in use by a banned user", dto.getIpAddress());
+                    throw new SystemException("IP address already in use by a banned user");
+                }
+            }
+        }
+
         HomeLabUser user = new HomeLabUser();
         user.setUsername(dto.getUsername());
         user.setPassword(passwordService.hash(dto.getPassword()));
-        user.setRole("USER");
+        user.setRole(KtxRole.USER);
         user.setCreated(LocalDateTime.now());
 
         HomeLabUser saved = authUserJpaRepository.save(user);
@@ -186,5 +216,39 @@ public class AuthService {
         LOGGER.debug("Sending event: {}", event);
         producer.sendEvent(event);
         authEventJpaRepository.save(event);
+    }
+
+    /**
+     * Bans a user by setting their status to banned.
+     *
+     * @param userId the ID of the user to ban
+     * @throws SystemException if the user is not found
+     */
+    @Transactional
+    public void banUser(String userId) throws SystemException {
+        LOGGER.info("Banning user {}", userId);
+        HomeLabUser user = authUserJpaRepository.findById(userId)
+                .orElseThrow(() -> new SystemException("User not found"));
+        user.setBan(true);
+        authUserJpaRepository.save(user);
+        logEvent(user, KtxEvent.EventType.USER_ACTION, "User banned", user.getUsername());
+        LOGGER.info("User {} banned", userId);
+    }
+
+    /**
+     * Unbans a user by removing their ban status.
+     *
+     * @param userId the ID of the user to unban
+     * @throws SystemException if the user is not found
+     */
+    @Transactional
+    public void unbanUser(String userId) throws SystemException {
+        LOGGER.info("Unbanning user {}", userId);
+        HomeLabUser user = authUserJpaRepository.findById(userId)
+                .orElseThrow(() -> new SystemException("User not found"));
+        user.setBan(false);
+        authUserJpaRepository.save(user);
+        logEvent(user, KtxEvent.EventType.USER_ACTION, "User unbanned", user.getUsername());
+        LOGGER.info("User {} unbanned", userId);
     }
 }

@@ -3,8 +3,6 @@ package com.kitano.auth.infrastructure.security;
 import com.kitano.auth.infrastructure.repository.AuthUserJpaRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -13,7 +11,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**
  * Security configuration class for the application.
- *
+ * <p>
  * This class configures the security settings for the application,
  * including authentication and authorization.
  */
@@ -36,7 +34,7 @@ public class SecurityConfig {
 
     /**
      * Configures the authentication manager.
-     *
+     * <p>
      * This method is used to create an AuthenticationManager bean
      * that is used for authenticating users.
      */

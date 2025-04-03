@@ -94,13 +94,13 @@ Interested in the process or thinking of contributing?
 
 This project applies a professional Git workflow based on issue-driven development.
 
--  Each branch starts from `main`
--  Work is grouped into:
-   - `feature/<short-desc>`
-   - `bug/<short-desc>`
-   - `task/<short-desc>`
--  All branches go through a Pull Request before merging
--  Issues and PRs are cross-linked (`Closes #42`)
+- Each branch starts from `main`
+- Work is grouped into:
+    - `feature/<short-desc>`
+    - `bug/<short-desc>`
+    - `task/<short-desc>`
+- All branches go through a Pull Request before merging
+- Issues and PRs are cross-linked (`Closes #42`)
 
 See full [Branching Convention](./BRANCHING_CONVENTION.md)
 
@@ -110,7 +110,9 @@ This project serves as a **real-world demonstration of security monitoring**, ev
 in microservices architecture with Hexagonal design**. 🚀
 
 ## **License**
+
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
 ```
 
 

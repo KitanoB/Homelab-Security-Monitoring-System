@@ -22,6 +22,8 @@
         <spring-boot.version>3.3.3</spring-boot.version>
         <jjwt.version>0.12.5</jjwt.version>
         <jacoco.version>0.8.11</jacoco.version>
+        <flyway.version>10.8.1</flyway.version>
+        <dotenv.version>2.2.0</dotenv.version>
     </properties>
 
     <dependencies>
@@ -92,7 +94,7 @@
         <dependency>
             <groupId>io.github.cdimascio</groupId>
             <artifactId>dotenv-java</artifactId>
-            <version>2.2.0</version>
+            <version>${dotenv.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -105,6 +107,16 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>${flyway.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+            <version>${flyway.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

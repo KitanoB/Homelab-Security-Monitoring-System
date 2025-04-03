@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -29,19 +28,14 @@ import java.util.concurrent.ScheduledExecutorService;
 public class JwtUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtUtils.class);
-
-    @Value("${jwt.secret:homelabSecretKey12345678901234567890}")
-    private String jwtSecret;
-
-    @Value("${jwt.expirationMs:3600000}") // 1 hour
-    private long jwtExpirationMs;
-
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    private SecretKey key;
-
     private final Set<String> blacklist = ConcurrentHashMap.newKeySet();
     private final Map<String, Long> expirationMap = new ConcurrentHashMap<>();
-
+    @Value("${jwt.secret:homelabSecretKey12345678901234567890}")
+    private String jwtSecret;
+    @Value("${jwt.expirationMs:3600000}") // 1 hour
+    private long jwtExpirationMs;
+    private SecretKey key;
 
     /**
      * Initializes the JwtUtils class by configuring the secret key and starting a scheduled task
@@ -60,7 +54,7 @@ public class JwtUtils {
 
     /**
      * Generates a JWT token for the given user.
-     *
+     * <p>
      * This method creates a JWT token with the user's username as the subject,
      * the current date as the issued date, and an expiration date based on the configured expiration time.
      * The token is signed with the secret key.
@@ -92,7 +86,7 @@ public class JwtUtils {
 
     /**
      * Validates the given JWT token.
-     *
+     * <p>
      * This method checks if the token is not null, not empty, not blacklisted,
      * and if it is well-formed. It also checks if the token is expired.
      *
@@ -139,7 +133,7 @@ public class JwtUtils {
 
     /**
      * Blacklists the given JWT token.
-     *
+     * <p>
      * This method adds the token to the blacklist and sets its expiration time.
      * If the token is already blacklisted, it does nothing.
      *
@@ -161,21 +155,21 @@ public class JwtUtils {
 
     /**
      * Checks if the given JWT token is blacklisted.
-     *
+     * <p>
      * This method checks if the token is present in the blacklist.
      *
      * @param token The JWT token to check.
      * @return true if the token is blacklisted, false otherwise.
      */
     public boolean isBlacklisted(String token) {
-        boolean blackListed =  blacklist.contains(token);
+        boolean blackListed = blacklist.contains(token);
         LOGGER.debug("Token is blacklisted: {}", blackListed);
         return blackListed;
     }
 
     /**
      * Removes expired tokens from the blacklist.
-     *
+     * <p>
      * This method iterates over the expiration map and removes tokens that have expired.
      * It also removes tokens from the blacklist that are no longer present in the expiration map.
      */

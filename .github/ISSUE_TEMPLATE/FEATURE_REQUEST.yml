@@ -1,8 +1,8 @@
 name: Feature Request
 description: Suggest a new feature or improvement
 title: "[Feature] <Short Description>"
-labels: ["enhancement"]
-projects: ["https://github.com/users/KitanoB/projects/4"]
+labels: [ "enhancement" ]
+projects: [ "https://github.com/users/KitanoB/projects/4" ]
 body:
   - type: textarea
     id: problem

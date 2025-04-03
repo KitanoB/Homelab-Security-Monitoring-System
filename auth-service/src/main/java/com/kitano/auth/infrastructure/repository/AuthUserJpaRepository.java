@@ -10,4 +10,5 @@ public interface AuthUserJpaRepository extends JpaRepository<HomeLabUser, String
     HomeLabUser findByUsername(String username);
 
     boolean existsByUsername(String username);
+
 }

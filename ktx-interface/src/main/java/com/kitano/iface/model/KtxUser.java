@@ -13,9 +13,13 @@ public interface KtxUser {
 
     void setPassword(String password);
 
-    String getRole();
+    Enum getRole();
 
-    void setRole(String role);
+    void setRole(KtxRole role);
 
     LocalDateTime getCreated();
+
+    boolean isBan();
+
+    void setBan(boolean ban);
 }

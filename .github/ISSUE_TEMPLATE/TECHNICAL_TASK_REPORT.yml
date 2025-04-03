@@ -1,8 +1,8 @@
 name: Technical Task
 description: Internal technical work (refactor, CI, etc.)
 title: "[Task] <Short Description>"
-labels: ["task"]
-projects: ["https://github.com/users/KitanoB/projects/4"]
+labels: [ "task" ]
+projects: [ "https://github.com/users/KitanoB/projects/4" ]
 body:
   - type: textarea
     id: context

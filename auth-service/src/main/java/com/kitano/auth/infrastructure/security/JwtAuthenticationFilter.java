@@ -32,11 +32,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * This method is called for every request to check if the user is authenticated.
      * It extracts the JWT token from the request and validates it.
      *
-     * @param request  The HttpServletRequest object.
-     * @param response The HttpServletResponse object.
+     * @param request     The HttpServletRequest object.
+     * @param response    The HttpServletResponse object.
      * @param filterChain The FilterChain object.
      * @throws ServletException If a servlet error occurs.
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException      If an I/O error occurs.
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -47,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = extractToken(request);
 
         // Validate the token and set the authentication in the context
-        if (token != null ) {
+        if (token != null) {
             if (jwtUtils.isBlacklisted(token)) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
@@ -77,7 +77,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     /**
      * Extracts the JWT token from the Authorization header.
-     *
+     * <p>
      * This method checks if the header is present and starts with "Bearer ".
      * If so, it extracts the token by removing the "Bearer " prefix.
      *

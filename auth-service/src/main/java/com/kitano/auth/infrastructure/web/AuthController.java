@@ -10,6 +10,7 @@ import com.kitano.auth.model.UserLoginDTO;
 import com.kitano.core.model.HomeLabUser;
 import com.kitano.core.model.SystemEvent;
 import com.kitano.core.model.SystemException;
+import com.kitano.iface.model.KtxRole;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -51,7 +52,7 @@ public class AuthController {
             return ResponseEntity.ok(token);
         } catch (SystemException e) {
             LOGGER.warn("Login failed for user {} from IP {}: {}", loginRequest.getUsername(), ipAddress, e.getMessage());
-            return ResponseEntity.status(401).body("Invalid username or password");
+            return ResponseEntity.status(401).body(e.getMessage());
         }
     }
 
@@ -96,9 +97,6 @@ public class AuthController {
     @GetMapping("/events")
     public ResponseEntity<?> getAllEvents(HttpServletRequest request) {
         LOGGER.info("Fetching all events from security-service");
-        if (!isAdmin(request)) {
-            return ResponseEntity.badRequest().body("Role ADMIN required");
-        }
         try {
             List<SystemEvent> events = securityClient.getAllEvents();
             return events.isEmpty()
@@ -107,6 +105,31 @@ public class AuthController {
         } catch (Exception e) {
             LOGGER.error("Error while fetching events: {}", e.getMessage());
             return ResponseEntity.status(500).build();
+        }
+    }
+
+    @PostMapping("/ban")
+    public ResponseEntity<?> banUser(@RequestBody String userId, HttpServletRequest request) {
+        LOGGER.info("Banning user with ID: {}", userId);
+        try {
+            authService.banUser(userId);
+            return ResponseEntity.ok("User banned successfully");
+        } catch (SystemException e) {
+            LOGGER.error("Error while banning user: {}", e.getMessage());
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+    }
+
+    @PostMapping
+    @RequestMapping("/unban")
+    public ResponseEntity<?> unbanUser(@RequestBody String userId, HttpServletRequest request) {
+        LOGGER.info("Unbanning user with ID: {}", userId);
+        try {
+            authService.unbanUser(userId);
+            return ResponseEntity.ok("User unbanned successfully");
+        } catch (SystemException e) {
+            LOGGER.error("Error while unbanning user: {}", e.getMessage());
+            return ResponseEntity.status(500).body(e.getMessage());
         }
     }
 
@@ -127,7 +150,7 @@ public class AuthController {
                 token = token.substring(7);
                 username = jwtUtils.getUsernameFromToken(token);
                 HomeLabUser user = authUserJpaRepository.findByUsername(username);
-                isAdmin = user != null && user.getRole().equals("ADMIN");
+                isAdmin = user != null && KtxRole.ADMIN.equals(user.getRole());
             }
         }
         return username != null && isAdmin;

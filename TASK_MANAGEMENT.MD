@@ -1,6 +1,7 @@
 # Task Management Guidelines
 
-This project uses GitHub Issues, Labels, Milestones, and Projects to structure work like in a professional environment. Every issue should be **clear, scoped, and traceable** — even if authored solo.
+This project uses GitHub Issues, Labels, Milestones, and Projects to structure work like in a professional environment.
+Every issue should be **clear, scoped, and traceable** — even if authored solo.
 
 ---
 
@@ -14,31 +15,31 @@ Labels are used to quickly understand the nature and importance of an issue. Eve
 
 ### Priority Labels
 
-| Label          | Meaning                                |
-|----------------|----------------------------------------|
+| Label              | Meaning                              |
+|--------------------|--------------------------------------|
 | `priority: high`   | Must be done ASAP, blocks other work |
 | `priority: medium` | Important, but not urgent            |
 | `priority: low`    | Nice to have / polish work           |
 
 ### Type Labels
 
-| Label           | Description                          |
-|------------------|--------------------------------------|
-| `bug`            | Something is broken                  |
-| `enhancement`    | New feature or improvement           |
-| `task`           | Internal work (CI, refactor, etc.)   |
-| `docs`           | Documentation-related issue          |
+| Label         | Description                        |
+|---------------|------------------------------------|
+| `bug`         | Something is broken                |
+| `enhancement` | New feature or improvement         |
+| `task`        | Internal work (CI, refactor, etc.) |
+| `docs`        | Documentation-related issue        |
 
 ### Component Labels
 
 Custom to your project. Examples:
 
-| Label            | Description                         |
-|------------------|-------------------------------------|
-| `auth`           | Login, tokens, permissions          |
-| `ui`             | Frontend or visual components       |
-| `api`            | REST endpoints or controllers       |
-| `infra`          | CI/CD, Docker, deployments          |
+| Label   | Description                   |
+|---------|-------------------------------|
+| `auth`  | Login, tokens, permissions    |
+| `ui`    | Frontend or visual components |
+| `api`   | REST endpoints or controllers |
+| `infra` | CI/CD, Docker, deployments    |
 
 ---
 
@@ -52,7 +53,7 @@ Custom to your project. Examples:
 
 Each merged feature/bug should close an issue linked to a milestone.
 
-##  Workflow Summary
+## Workflow Summary
 
 1. **Create an issue** using the proper template
 2. **Add labels**:
@@ -64,6 +65,7 @@ Each merged feature/bug should close an issue linked to a milestone.
 5. **Link to PR** using `Closes #issue`
 
 ## Example Issue
+
 ```md
 Title: [Bug] Token not refreshed after login
 Labels: bug, priority: high, auth
