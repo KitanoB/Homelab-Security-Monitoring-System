@@ -111,8 +111,11 @@ public class AuthService {
 
         // Check if the IP address is already in use
         // and if the user is banned
-        if (authUserJpaRepository.existByIpAddress(dto.getIpAddress())) {
+        if (authUserJpaRepository.existByIpAddress(dto.getIpAddress()) || authUserJpaRepository.existsByEmail(dto.getEmail())) {
             HomeLabUser user = authUserJpaRepository.findByIpAddress(dto.getIpAddress());
+            if (user == null) {
+                user = authUserJpaRepository.findByEmail(dto.getEmail());
+            }
             if (user != null && user.isBan()) {
                 LOGGER.error("User with IP {} is banned", dto.getIpAddress());
                 throw new SystemException("User with this IP is banned");
