@@ -13,6 +13,7 @@ import com.kitano.core.model.HomeLabUser;
 import com.kitano.core.model.SystemEvent;
 import com.kitano.core.model.SystemException;
 import com.kitano.iface.model.KtxEvent;
+import com.kitano.iface.model.KtxRole;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -107,7 +108,7 @@ public class AuthService {
         HomeLabUser user = new HomeLabUser();
         user.setUsername(dto.getUsername());
         user.setPassword(passwordService.hash(dto.getPassword()));
-        user.setRole("USER");
+        user.setRole(KtxRole.USER);
         user.setCreated(LocalDateTime.now());
 
         HomeLabUser saved = authUserJpaRepository.save(user);

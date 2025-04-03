@@ -10,6 +10,7 @@ import com.kitano.auth.model.UserLoginDTO;
 import com.kitano.core.model.HomeLabUser;
 import com.kitano.core.model.SystemEvent;
 import com.kitano.core.model.SystemException;
+import com.kitano.iface.model.KtxRole;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -127,7 +128,7 @@ public class AuthController {
                 token = token.substring(7);
                 username = jwtUtils.getUsernameFromToken(token);
                 HomeLabUser user = authUserJpaRepository.findByUsername(username);
-                isAdmin = user != null && user.getRole().equals("ADMIN");
+                isAdmin = user != null && KtxRole.ADMIN.equals(user.getRole());
             }
         }
         return username != null && isAdmin;
