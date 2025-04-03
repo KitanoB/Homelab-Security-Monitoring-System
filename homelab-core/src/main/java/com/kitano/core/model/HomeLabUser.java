@@ -55,11 +55,11 @@ public class HomeLabUser implements KtxUser {
 
     @Override
     public boolean isBan() {
-        return enabled;
+        return !enabled;
     }
 
     @Override
     public void setBan(boolean ban) {
-        this.enabled = ban;
+        this.enabled = !ban;
     }
 }

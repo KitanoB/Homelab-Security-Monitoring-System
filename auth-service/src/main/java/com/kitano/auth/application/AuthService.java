@@ -26,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Service class for handling authentication-related operations.
@@ -111,20 +113,26 @@ public class AuthService {
 
         // Check if the IP address is already in use
         // and if the user is banned
-        if (authUserJpaRepository.existByIpAddress(dto.getIpAddress()) || authUserJpaRepository.existsByEmail(dto.getEmail())) {
-            HomeLabUser user = authUserJpaRepository.findByIpAddress(dto.getIpAddress());
-            if (user == null) {
-                user = authUserJpaRepository.findByEmail(dto.getEmail());
-            }
-            if (user != null && user.isBan()) {
-                LOGGER.error("User with IP {} is banned", dto.getIpAddress());
-                throw new SystemException("User with this IP is banned");
-            } else if (user != null) {
-                LOGGER.error("User with IP {} already exists", dto.getIpAddress());
-                throw new SystemException("User with this IP already exists");
+        if (authEventJpaRepository.existsByIpAddress(dto.getIpAddress())) {
+
+            List<SystemEvent> events = authEventJpaRepository.findByIpAddress(dto.getIpAddress());
+            List<String> userId = events.stream()
+                    .map(SystemEvent::getUserId)
+                    .distinct()
+                    .toList();
+
+            if (!userId.isEmpty()) {
+                boolean isSuspicious = userId.stream().map(
+                        authUserJpaRepository::findById).filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .anyMatch(HomeLabUser::isBan);
+
+                if (isSuspicious) {
+                    LOGGER.error("IP address {} is already in use by a banned user", dto.getIpAddress());
+                    throw new SystemException("IP address already in use by a banned user");
+                }
             }
         }
-
 
         HomeLabUser user = new HomeLabUser();
         user.setUsername(dto.getUsername());

@@ -11,11 +11,4 @@ public interface AuthUserJpaRepository extends JpaRepository<HomeLabUser, String
 
     boolean existsByUsername(String username);
 
-    boolean existByIpAddress(String ipAddress);
-
-    HomeLabUser findByIpAddress(String ipAddress);
-
-    HomeLabUser findByEmail(String email);
-
-    boolean existsByEmail(String email);
 }

@@ -52,7 +52,7 @@ public class AuthController {
             return ResponseEntity.ok(token);
         } catch (SystemException e) {
             LOGGER.warn("Login failed for user {} from IP {}: {}", loginRequest.getUsername(), ipAddress, e.getMessage());
-            return ResponseEntity.status(401).body("Invalid username or password");
+            return ResponseEntity.status(401).body(e.getMessage());
         }
     }
 
@@ -97,9 +97,6 @@ public class AuthController {
     @GetMapping("/events")
     public ResponseEntity<?> getAllEvents(HttpServletRequest request) {
         LOGGER.info("Fetching all events from security-service");
-        if (!isAdmin(request)) {
-            return ResponseEntity.badRequest().body("Role ADMIN required");
-        }
         try {
             List<SystemEvent> events = securityClient.getAllEvents();
             return events.isEmpty()
@@ -114,9 +111,6 @@ public class AuthController {
     @PostMapping("/ban")
     public ResponseEntity<?> banUser(@RequestBody String userId, HttpServletRequest request) {
         LOGGER.info("Banning user with ID: {}", userId);
-        if (!isAdmin(request)) {
-            return ResponseEntity.badRequest().body("Role ADMIN required");
-        }
         try {
             authService.banUser(userId);
             return ResponseEntity.ok("User banned successfully");
@@ -130,9 +124,6 @@ public class AuthController {
     @RequestMapping("/unban")
     public ResponseEntity<?> unbanUser(@RequestBody String userId, HttpServletRequest request) {
         LOGGER.info("Unbanning user with ID: {}", userId);
-        if (!isAdmin(request)) {
-            return ResponseEntity.badRequest().body("Role ADMIN required");
-        }
         try {
             authService.unbanUser(userId);
             return ResponseEntity.ok("User unbanned successfully");
