@@ -80,6 +80,10 @@ public class AuthService {
             LOGGER.error("Invalid credentials for user {}", loginRequest.getUsername());
             logEvent(user, KtxEvent.EventType.AUTHENTICATION_FAILURE, "Bad credentials", loginRequest.getIpAddress());
             throw new SystemException("Invalid credentials");
+        } else if (user.isBan()) {
+            LOGGER.error("User {} is banned", loginRequest.getUsername());
+            logEvent(user, KtxEvent.EventType.AUTHENTICATION_FAILURE, "User is banned", loginRequest.getIpAddress());
+            throw new SystemException("User is banned");
         }
 
         logEvent(user, KtxEvent.EventType.AUTHENTICATION_SUCCESS, "Login successful", loginRequest.getIpAddress());
@@ -104,6 +108,20 @@ public class AuthService {
             LOGGER.error("Username already in use: {}", dto.getUsername());
             throw new SystemException("Username already in use");
         }
+
+        // Check if the IP address is already in use
+        // and if the user is banned
+        if (authUserJpaRepository.existByIpAddress(dto.getIpAddress())) {
+            HomeLabUser user = authUserJpaRepository.findByIpAddress(dto.getIpAddress());
+            if (user != null && user.isBan()) {
+                LOGGER.error("User with IP {} is banned", dto.getIpAddress());
+                throw new SystemException("User with this IP is banned");
+            } else if (user != null) {
+                LOGGER.error("User with IP {} already exists", dto.getIpAddress());
+                throw new SystemException("User with this IP already exists");
+            }
+        }
+
 
         HomeLabUser user = new HomeLabUser();
         user.setUsername(dto.getUsername());
