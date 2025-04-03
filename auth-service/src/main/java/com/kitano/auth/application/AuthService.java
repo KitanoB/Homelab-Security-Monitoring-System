@@ -13,12 +13,25 @@ import com.kitano.core.model.HomeLabUser;
 import com.kitano.core.model.SystemEvent;
 import com.kitano.core.model.SystemException;
 import com.kitano.iface.model.KtxEvent;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+/**
+ * Service class for handling authentication-related operations.
+ *
+ * This class provides methods for user login, registration, and logout.
+ * It also handles event logging for authentication actions.
+ */
 @Service
 public class AuthService {
 
@@ -42,6 +55,15 @@ public class AuthService {
         this.producer = producer;
     }
 
+    /**
+     * Logs in a user by validating their credentials and generating a JWT token.
+     *
+     * @param loginRequest the login request containing username and password
+     * @return a JWT token if login is successful
+     * @throws SystemException if the user is not found or credentials are invalid
+     */
+
+    @Transactional
     public String login(UserLoginDTO loginRequest) throws SystemException {
         LOGGER.info("Login attempt for user {}", loginRequest.getUsername());
 
@@ -65,6 +87,14 @@ public class AuthService {
         return jwtUtils.generateToken(UserMapper.toDto(user));
     }
 
+    /**
+     * Registers a new user by saving their credentials and generating an event.
+     *
+     * @param dto the user creation DTO containing username and password
+     * @return the registered user DTO
+     * @throws SystemException if the username is already in use
+     */
+    @Transactional
     public HomelabUserDTO register(HomelabUserCreateDTO dto) throws SystemException {
 
         LOGGER.info("Registering user {}", dto.getUsername());
@@ -87,6 +117,59 @@ public class AuthService {
         LOGGER.info("User {} registered", dto.getUsername());
         return UserMapper.toDto(saved);
     }
+
+    /**
+     * Logs out the user by invalidating the JWT token and clearing the authentication context.
+     *
+     * @param request  the HTTP request
+     * @param response the HTTP response
+     * @throws SystemException if the user is not authenticated
+     */
+    @Transactional
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) throws SystemException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
+            String token = request.getHeader("Authorization");
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            } else {
+                throw new SystemException("Invalid token format");
+            }
+            String username = jwtUtils.getUsernameFromToken(token);
+            HomeLabUser user = authUserJpaRepository.findByUsername(username);
+            jwtUtils.blacklist(token);
+            if (user != null) {
+                logEvent(user, KtxEvent.EventType.USER_ACTION, "User logged out", request.getRemoteAddr());
+            } else {
+                LOGGER.warn("User not found during logout: {}", username);
+            }
+            // Invalidate the token (if applicable)
+            // This could involve adding the token to a blacklist or similar mechanism
+            // For now, we just log the event
+            LOGGER.info("User {} logged out", username);
+            // Clear the authentication context
+            SecurityContextHolder.clearContext();
+            // Optionally, you can also invalidate the session
+            request.getSession().invalidate();
+
+
+            // Returns a successful response indicating that the logout process was completed
+            return ResponseEntity.ok("Logout successful");
+        } else {
+            // Throws an exception if the user was not authenticated in the first place
+            throw new SystemException("User not authenticated");
+        }
+    }
+
+    /**
+     * Logs an event related to authentication actions.
+     *
+     * @param user    the user associated with the event
+     * @param type    the type of event
+     * @param message the message describing the event
+     * @param ip      the IP address of the user
+     */
 
     private void logEvent(HomeLabUser user, KtxEvent.EventType type, String message, String ip) {
         SystemEvent event = SystemEvent.builder()
