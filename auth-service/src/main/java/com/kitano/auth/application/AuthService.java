@@ -26,6 +26,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+/**
+ * Service class for handling authentication-related operations.
+ *
+ * This class provides methods for user login, registration, and logout.
+ * It also handles event logging for authentication actions.
+ */
 @Service
 public class AuthService {
 
@@ -48,6 +54,14 @@ public class AuthService {
         this.jwtUtils = jwtUtils;
         this.producer = producer;
     }
+
+    /**
+     * Logs in a user by validating their credentials and generating a JWT token.
+     *
+     * @param loginRequest the login request containing username and password
+     * @return a JWT token if login is successful
+     * @throws SystemException if the user is not found or credentials are invalid
+     */
 
     @Transactional
     public String login(UserLoginDTO loginRequest) throws SystemException {
@@ -73,6 +87,13 @@ public class AuthService {
         return jwtUtils.generateToken(UserMapper.toDto(user));
     }
 
+    /**
+     * Registers a new user by saving their credentials and generating an event.
+     *
+     * @param dto the user creation DTO containing username and password
+     * @return the registered user DTO
+     * @throws SystemException if the username is already in use
+     */
     @Transactional
     public HomelabUserDTO register(HomelabUserCreateDTO dto) throws SystemException {
 
@@ -97,6 +118,13 @@ public class AuthService {
         return UserMapper.toDto(saved);
     }
 
+    /**
+     * Logs out the user by invalidating the JWT token and clearing the authentication context.
+     *
+     * @param request  the HTTP request
+     * @param response the HTTP response
+     * @throws SystemException if the user is not authenticated
+     */
     @Transactional
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) throws SystemException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -133,6 +161,15 @@ public class AuthService {
             throw new SystemException("User not authenticated");
         }
     }
+
+    /**
+     * Logs an event related to authentication actions.
+     *
+     * @param user    the user associated with the event
+     * @param type    the type of event
+     * @param message the message describing the event
+     * @param ip      the IP address of the user
+     */
 
     private void logEvent(HomeLabUser user, KtxEvent.EventType type, String message, String ip) {
         SystemEvent event = SystemEvent.builder()

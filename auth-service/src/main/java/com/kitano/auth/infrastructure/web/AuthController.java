@@ -2,10 +2,12 @@ package com.kitano.auth.infrastructure.web;
 
 import com.kitano.auth.application.AuthService;
 import com.kitano.auth.infrastructure.proxy.SecurityServiceClient;
+import com.kitano.auth.infrastructure.repository.AuthUserJpaRepository;
 import com.kitano.auth.infrastructure.security.JwtUtils;
 import com.kitano.auth.model.HomelabUserCreateDTO;
 import com.kitano.auth.model.HomelabUserDTO;
 import com.kitano.auth.model.UserLoginDTO;
+import com.kitano.core.model.HomeLabUser;
 import com.kitano.core.model.SystemEvent;
 import com.kitano.core.model.SystemException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,11 +30,13 @@ public class AuthController {
     private final AuthService authService;
     private final SecurityServiceClient securityClient;
     private final JwtUtils jwtUtils;
+    private final AuthUserJpaRepository authUserJpaRepository;
 
-    public AuthController(AuthService authService, SecurityServiceClient securityClient, JwtUtils jwtUtils) {
+    public AuthController(AuthService authService, SecurityServiceClient securityClient, JwtUtils jwtUtils, AuthUserJpaRepository authUserJpaRepository) {
         this.authService = authService;
         this.securityClient = securityClient;
         this.jwtUtils = jwtUtils;
+        this.authUserJpaRepository = authUserJpaRepository;
     }
 
     /**
@@ -93,20 +96,9 @@ public class AuthController {
     @GetMapping("/events")
     public ResponseEntity<?> getAllEvents(HttpServletRequest request) {
         LOGGER.info("Fetching all events from security-service");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            String token = request.getHeader("Authorization");
-            String username = null;
-            if (token != null && token.startsWith("Bearer ")) {
-                token = token.substring(7);
-                username = jwtUtils.getUsernameFromToken(token);
-            }
-            if (username == null) {
-                LOGGER.warn("User not found during event fetch");
-                return ResponseEntity.badRequest().body("User not authenticated");
-            }
-        } else return ResponseEntity.badRequest().body("User not authenticated");
-
+        if (!isAdmin(request)) {
+            return ResponseEntity.badRequest().body("Role ADMIN required");
+        }
         try {
             List<SystemEvent> events = securityClient.getAllEvents();
             return events.isEmpty()
@@ -116,5 +108,28 @@ public class AuthController {
             LOGGER.error("Error while fetching events: {}", e.getMessage());
             return ResponseEntity.status(500).build();
         }
+    }
+
+    /**
+     * Check if the user is allowed to access the events.
+     * To be allowed, the user must be authenticated and have the role "ADMIN".
+     *
+     * @param request
+     * @return
+     */
+    private boolean isAdmin(HttpServletRequest request) {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = null;
+        boolean isAdmin = false;
+        if (authentication != null && authentication.isAuthenticated()) {
+            String token = request.getHeader("Authorization");
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+                username = jwtUtils.getUsernameFromToken(token);
+                HomeLabUser user = authUserJpaRepository.findByUsername(username);
+                isAdmin = user != null && user.getRole().equals("ADMIN");
+            }
+        }
+        return username != null && isAdmin;
     }
 }

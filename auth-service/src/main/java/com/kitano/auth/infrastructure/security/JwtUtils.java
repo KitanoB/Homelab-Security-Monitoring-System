@@ -20,6 +20,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+/**
+ * Utility class for generating and validating JWT tokens.
+ * It uses a secret key to sign the tokens and provides methods to check their validity.
+ * The class also manages a blacklist of tokens that have been invalidated.
+ */
 @Component
 public class JwtUtils {
 
@@ -38,7 +43,10 @@ public class JwtUtils {
     private final Map<String, Long> expirationMap = new ConcurrentHashMap<>();
 
 
-
+    /**
+     * Initializes the JwtUtils class by configuring the secret key and starting a scheduled task
+     * to remove expired tokens from the blacklist.
+     */
     @PostConstruct
     public void init() {
         if (jwtSecret == null || jwtSecret.isEmpty()) {
@@ -50,6 +58,16 @@ public class JwtUtils {
         scheduler.scheduleAtFixedRate(this::removeExpiredTokens, 1, 1, java.util.concurrent.TimeUnit.HOURS);
     }
 
+    /**
+     * Generates a JWT token for the given user.
+     *
+     * This method creates a JWT token with the user's username as the subject,
+     * the current date as the issued date, and an expiration date based on the configured expiration time.
+     * The token is signed with the secret key.
+     *
+     * @param user The user for whom the token is generated.
+     * @return The generated JWT token.
+     */
     public String generateToken(HomelabUserDTO user) {
         return Jwts.builder()
                 .subject(user.username())
@@ -59,6 +77,12 @@ public class JwtUtils {
                 .compact();
     }
 
+    /**
+     * Extracts the username from the given JWT token.
+     *
+     * @param token The JWT token.
+     * @return The username extracted from the token.
+     */
     public String getUsernameFromToken(String token) {
         return Jwts.parser().verifyWith(key).build()
                 .parseSignedClaims(token)
@@ -66,6 +90,15 @@ public class JwtUtils {
                 .getSubject();
     }
 
+    /**
+     * Validates the given JWT token.
+     *
+     * This method checks if the token is not null, not empty, not blacklisted,
+     * and if it is well-formed. It also checks if the token is expired.
+     *
+     * @param token The JWT token to validate.
+     * @return true if the token is valid, false otherwise.
+     */
     public boolean validateToken(String token) {
 
         if (token == null || token.isEmpty()) {
@@ -104,6 +137,14 @@ public class JwtUtils {
         }
     }
 
+    /**
+     * Blacklists the given JWT token.
+     *
+     * This method adds the token to the blacklist and sets its expiration time.
+     * If the token is already blacklisted, it does nothing.
+     *
+     * @param token The JWT token to blacklist.
+     */
     public void blacklist(String token) {
         if (token == null || token.isEmpty()) {
             return;
@@ -118,12 +159,26 @@ public class JwtUtils {
         blacklist.add(token);
     }
 
+    /**
+     * Checks if the given JWT token is blacklisted.
+     *
+     * This method checks if the token is present in the blacklist.
+     *
+     * @param token The JWT token to check.
+     * @return true if the token is blacklisted, false otherwise.
+     */
     public boolean isBlacklisted(String token) {
         boolean blackListed =  blacklist.contains(token);
         LOGGER.debug("Token is blacklisted: {}", blackListed);
         return blackListed;
     }
 
+    /**
+     * Removes expired tokens from the blacklist.
+     *
+     * This method iterates over the expiration map and removes tokens that have expired.
+     * It also removes tokens from the blacklist that are no longer present in the expiration map.
+     */
     private void removeExpiredTokens() {
         long currentTime = System.currentTimeMillis();
         expirationMap.entrySet().removeIf(entry -> entry.getValue() < currentTime);

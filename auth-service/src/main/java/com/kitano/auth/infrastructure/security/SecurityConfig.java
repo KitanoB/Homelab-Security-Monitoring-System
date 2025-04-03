@@ -10,6 +10,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+/**
+ * Security configuration class for the application.
+ *
+ * This class configures the security settings for the application,
+ * including authentication and authorization.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -27,6 +34,12 @@ public class SecurityConfig {
         return new JwtAuthenticationFilter(jwtUtils, repository);
     }
 
+    /**
+     * Configures the authentication manager.
+     *
+     * This method is used to create an AuthenticationManager bean
+     * that is used for authenticating users.
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
